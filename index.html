@@ -194,6 +194,17 @@
         let currentCoins = 0;
         let tapCount = 0;
         let tapTimer = null;
+        // මේ කොටසින් වෙන්නේ පේජ් එක Refresh කළත් ඔයා ලොග් වෙලා ඉන්නවාද කියලා පරීක්ෂා කරන එකයි
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        // පරිශීලකයා කලින් ලොග් වී සිටී නම් කෙලින්ම App එක පෙන්වන්න
+        setupApp(user);
+    } else {
+        // ලොග් වී නැතිනම් Login Page එක පෙන්වන්න
+        document.getElementById('login-page').style.display = 'flex';
+        document.getElementById('app-content').classList.add('hidden');
+    }
+});
 
         // --- AUTHENTICATION ---
         async function handleLogin() {
@@ -413,5 +424,6 @@ async function startLive() {
     </script>
 </body>
 </html>
+
 
 
