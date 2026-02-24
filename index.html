@@ -241,24 +241,42 @@
 
         function toggleGifts() { document.getElementById('gift-box').classList.toggle('hidden'); }
 
-        // --- LIVE VIDEO (AGORA) ---
-        async function startLive() {
-            document.getElementById('live-room').classList.remove('hidden');
-            try {
-                await agoraClient.join(AGORA_APP_ID, "main_room", null, currentUser.uid);
-                // Open Camera and Mic
-                localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-                // Play video in the grid
-                localTracks[1].play("video-grid");
-                await agoraClient.publish(localTracks);
-                
-                document.getElementById('live-chat').innerHTML += `<p class="text-green-400"><b>System:</b> Camera Connected!</p>`;
-            } catch (e) {
-                alert("Please Allow Camera & Microphone Permissions!");
-                console.error(e);
-                endLive();
-            }
-        }
+        // --- LIVE VIDEO (AGORA) WITH ERROR FIX ---
+async function startLive() {
+    const liveRoom = document.getElementById('live-room');
+    liveRoom.classList.remove('hidden');
+    
+    try {
+        // 1. Join Channel
+        await agoraClient.join(AGORA_APP_ID, "main_room", null, currentUser.uid);
+        
+        // 2. Create Tracks (මෙතනදී තමයි කැමරාව ඉල්ලන්නේ)
+        // මයික්‍රෆෝනය හෝ කැමරාවෙන් එකක් නැති වුණත් වැඩ කරන විදියට මෙතන වෙනස් කළා
+        localTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
+            { encoderConfig: "720p_1" }, 
+            { position: 'front' }
+        ).catch(err => {
+            console.error("Permission Error:", err);
+            throw new Error("කැමරාවට හෝ මයික්‍රෆෝනයට අවසර ලබා දිය නොහැක. කරුණාකර Settings පරීක්ෂා කරන්න.");
+        });
+
+        // 3. Play video
+        const videoContainer = document.getElementById('video-grid');
+        videoContainer.innerHTML = ''; // කලින් තිබුණ දේවල් අයින් කරන්න
+        localTracks[1].play(videoContainer);
+        
+        // 4. Publish
+        await agoraClient.publish(localTracks);
+        
+        document.getElementById('live-chat').innerHTML += `<p class="text-green-400"><b>System:</b> Live Started!</p>`;
+        
+    } catch (e) {
+        console.error(e);
+        alert(e.message);
+        endLive(); // Error එකක් ආවොත් ලයිව් රූම් එක වහන්න
+    }
+}
+
 
         function endLive() {
             localTracks.forEach(track => { track.stop(); track.close(); });
@@ -395,3 +413,4 @@
     </script>
 </body>
 </html>
+
