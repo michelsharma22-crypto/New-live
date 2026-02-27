@@ -12,21 +12,18 @@
     
     <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.18.2.js"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=ATfsClCXiMMz7YyApME13i3yJkQK4UPDTL3PwPNh10Et5d17z9cpk-6_q0MqvCrVya9T5kwcc-OCY&currency=USD"></script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root { --neon-pink: #ff0077; --glass: rgba(0, 0, 0, 0.75); }
-
         body {
             margin: 0; font-family: 'Poppins', sans-serif;
             background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?q=80&w=2071');
             background-size: cover; background-position: center; background-attachment: fixed;
             color: white; overflow-x: hidden; user-select: none;
         }
-
         .glass-panel { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; }
         .neon-text { text-shadow: 0 0 10px var(--neon-pink); }
         .neon-btn { background: linear-gradient(45deg, var(--neon-pink), #ff00bb); box-shadow: 0 4px 15px rgba(255, 0, 119, 0.4); transition: 0.3s; }
@@ -34,32 +31,23 @@
         .page { display: none; min-height: 100vh; padding-top: 80px; padding-bottom: 90px; }
         .active-page { display: block; }
         #video-grid { height: 70vh; background: #000; border-radius: 20px; overflow: hidden; position: relative; }
-        #video-grid video { object-fit: cover !important; }
-        
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #ff0077; border-radius: 10px; }
-
+        
+        /* Gift Animation */
         @keyframes gift-pop {
             0% { transform: scale(0) rotate(-20deg); opacity: 0; }
             50% { transform: scale(1.5) rotate(10deg); opacity: 1; }
             100% { transform: scale(1.2) rotate(0deg); opacity: 0; }
         }
         .gift-animate { animation: gift-pop 2s ease-out forwards; position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; z-index: 200; pointer-events: none; text-shadow: 0 0 30px rgba(255, 0, 119, 0.8); }
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
-        .float-anim { animation: float 3s ease-in-out infinite; }
     </style>
 </head>
 <body>
 
     <div id="login-page" class="flex flex-col items-center justify-center min-h-screen px-6 z-50 relative">
         <div class="glass-panel p-8 w-full max-w-md text-center border-t-4 border-pink-600">
-            <div class="mb-6 relative">
-                <div class="w-20 h-20 bg-pink-600 rounded-full mx-auto flex items-center justify-center float-anim shadow-[0_0_40px_rgba(255,0,119,0.6)]">
-                    <i class="fas fa-heart text-3xl text-white"></i>
-                </div>
-            </div>
-            <h1 onclick="secretAdminCheck()" class="text-4xl font-bold neon-text mb-2 cursor-pointer active:scale-95 transition">YNS LIVE</h1>
+            <h1 onclick="secretAdminCheck()" class="text-4xl font-bold neon-text mb-2 cursor-pointer">YNS LIVE</h1>
             <p class="text-gray-400 text-sm mb-8 tracking-widest uppercase">Premium Dating & Live</p>
             <div class="space-y-4">
                 <input id="email" type="email" placeholder="Email Address" class="w-full p-4 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-pink-500 transition text-white">
@@ -72,9 +60,7 @@
 
     <div id="app-content" class="hidden">
         <header class="fixed top-0 w-full z-40 p-4 flex justify-between items-center bg-black/60 backdrop-blur-lg border-b border-white/10">
-            <div class="flex items-center gap-2">
-                <span onclick="secretAdminCheck()" class="text-2xl font-black text-pink-600 cursor-pointer">YNS</span>
-            </div>
+            <span onclick="secretAdminCheck()" class="text-2xl font-black text-pink-600 cursor-pointer">YNS</span>
             <div class="flex gap-3">
                 <div onclick="showPage('wallet')" class="bg-white/10 px-4 py-2 rounded-full border border-pink-500/30 flex items-center gap-2 cursor-pointer hover:bg-white/20">
                     <i class="fas fa-gem text-blue-400"></i>
@@ -85,165 +71,145 @@
         </header>
 
         <div id="home-page" class="page active-page px-4">
-            <div class="flex gap-4 overflow-x-auto py-2 mb-6">
-                <div onclick="startLive()" class="flex-shrink-0 w-16 h-16 rounded-full border-2 border-dashed border-pink-600 flex items-center justify-center bg-pink-600/20 cursor-pointer">
-                    <i class="fas fa-video text-pink-500"></i>
-                </div>
-                <div class="w-16 h-16 rounded-full border-2 border-pink-600 p-0.5"><img src="https://i.pravatar.cc/100?img=10" class="rounded-full"></div>
+            <div class="glass-panel p-6 mb-20 text-center">
+                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=500" class="w-full h-48 object-cover rounded-xl mb-4">
+                <h3 class="text-xl font-bold mb-2">Welcome Back!</h3>
+                <p class="text-gray-400 text-sm mb-6">Start your live session and meet new people.</p>
+                <button onclick="startLive()" class="neon-btn px-10 py-4 rounded-full font-bold flex items-center gap-2 mx-auto">
+                    <i class="fas fa-video"></i> GO LIVE NOW
+                </button>
             </div>
-            <div class="glass-panel p-4 mb-20">
-                <div class="flex items-center gap-3 mb-3">
-                    <img src="https://i.pravatar.cc/100?img=32" class="w-10 h-10 rounded-full">
-                    <div><p class="font-bold">Angel_Rose </p><p class="text-xs text-gray-400">Live Now</p></div>
-                </div>
-                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=1887" class="w-full rounded-xl mb-3 text-center cursor-pointer" onclick="startLive()">
-                <div class="flex gap-4"><i class="far fa-heart text-xl text-pink-500"></i><i class="far fa-comment text-xl"></i></div>
-            </div>
-        </div>
-
-        <div id="live-room" class="hidden fixed inset-0 bg-black z-[100] flex flex-col">
-            <div id="video-grid" class="flex-1 w-full h-full relative"></div>
-            <div class="absolute bottom-0 w-full p-6 bg-gradient-to-t from-black via-black/80 to-transparent z-[110]">
-                <div id="live-chat" class="h-48 overflow-y-auto mb-4 space-y-2 text-sm drop-shadow-lg"></div>
-                <div class="flex items-center gap-3 relative">
-                    <input id="chat-msg" type="text" placeholder="Say hi..." class="flex-1 bg-white/10 p-3 rounded-full border border-white/20 outline-none text-white">
-                    <button onclick="toggleGifts()" class="bg-pink-600 p-4 rounded-full shadow-lg"><i class="fas fa-gift"></i></button>
-                    <button onclick="endLive()" class="bg-red-600 p-4 rounded-full"><i class="fas fa-times"></i></button>
-                </div>
-            </div>
-            <div id="gift-box" class="hidden absolute bottom-24 left-4 right-4 glass-panel z-[120] border-t-2 border-pink-600 shadow-[0_0_25px_rgba(255,0,119,0.5)]">
-                <div class="p-2 border-b border-white/10 text-center">
-                    <span class="text-[10px] font-bold text-pink-500 uppercase">Select a Gift</span>
-                </div>
-                <div class="grid grid-cols-4 gap-3 p-4 max-h-72 overflow-y-auto custom-scrollbar">
-                    <div onclick="sendGift('Rose', 10, '')" class="text-center p-2 cursor-pointer hover:bg-white/10 rounded"><span class="text-3xl"></span><p class="text-[10px] mt-1 text-pink-300">10</p></div>
-                    <div onclick="sendGift('Kiss', 50, '')" class="text-center p-2 cursor-pointer hover:bg-white/10 rounded"><span class="text-3xl"></span><p class="text-[10px] mt-1 text-pink-300">50</p></div>
-                    <div onclick="sendGift('Sexy Bra', 400, '')" class="text-center p-2 cursor-pointer hover:bg-white/10 rounded"><span class="text-3xl"></span><p class="text-[10px] mt-1 text-pink-300">400</p></div>
-                    <div onclick="sendGift('Condom', 150, '')" class="text-center p-2 cursor-pointer hover:bg-white/10 rounded"><span class="text-3xl"></span><p class="text-[10px] mt-1 text-pink-300">150</p></div>
-                    <div onclick="sendGift('Love Bed', 1500, '')" class="text-center p-2 cursor-pointer hover:bg-white/10 rounded"><span class="text-3xl"></span><p class="text-[10px] mt-1 text-pink-300">1500</p></div>
-                    <div onclick="sendGift('Shower', 800, '')" class="text-center p-2 cursor-pointer hover:bg-white/10 rounded"><span class="text-3xl"></span><p class="text-[10px] mt-1 text-pink-300">800</p></div>
-                    <div onclick="sendGift('Full Night', 9999, '')" class="text-center p-2 cursor-pointer hover:bg-white/10 rounded"><span class="text-3xl"></span><p class="text-[10px] mt-1 text-pink-300">9999</p></div>
-                </div>
-            </div>
-            <div id="gift-animation-container" class="fixed inset-0 pointer-events-none z-[200]"></div>
         </div>
 
         <div id="wallet-page" class="page px-6">
             <h2 class="text-2xl font-bold mb-6 neon-text text-center">Top Up Coins</h2>
-            
             <div class="glass-panel p-6 mb-6">
-                <h3 class="text-blue-400 font-bold mb-4 text-center"><i class="fab fa-paypal mr-2"></i> Instant Top Up</h3>
-                <div id="paypal-button-container" class="mt-2"></div>
+                <h3 class="text-blue-400 font-bold mb-4 text-center"><i class="fab fa-paypal mr-2"></i> PayPal Top Up</h3>
+                <div id="paypal-button-container"></div>
             </div>
-
             <div class="glass-panel p-6 border-l-4 border-yellow-500 mb-6">
-                <h3 class="text-yellow-500 font-bold mb-4"><i class="fas fa-university mr-2"></i> BANK TRANSFER</h3>
-                <div class="p-3 bg-white/5 rounded-lg border border-white/10 text-sm">
-                    <p class="text-gray-400">SAMPATH BANK</p>
-                    <p class="text-lg font-mono text-white">105057458082</p>
-                    <p class="text-gray-300">J A Y S KAVINDA</p>
-                </div>
+                <p class="text-gray-400 text-xs uppercase">Bank Account</p>
+                <p class="text-lg font-mono text-white">105057458082</p>
+                <p class="text-gray-300">J A Y S KAVINDA (Sampath Bank)</p>
             </div>
             <div class="glass-panel p-6 mb-20">
                 <input id="dep-amount" type="number" placeholder="Amount (LKR)" class="w-full p-4 bg-white/5 border border-white/10 rounded-xl mb-4 text-white">
-                <input id="dep-slip" type="file" class="w-full p-2 bg-white/5 rounded-xl mb-6 text-gray-400">
-                <button onclick="processDeposit()" class="w-full bg-green-600 p-4 rounded-xl font-bold text-white">SUBMIT SLIP</button>
+                <input id="dep-slip" type="file" class="w-full p-2 text-xs text-gray-400 mb-4">
+                <button onclick="processDeposit()" class="w-full bg-green-600 p-4 rounded-xl font-bold">SUBMIT SLIP</button>
             </div>
         </div>
-        ****
-**<div id="profile-page" class="page px-6">**
-** <div class="glass-panel p-8 text-center mt-10">**
-** <div class="w-24 h-24 bg-pink-600 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl font-bold">**
-** <i class="fas fa-user"></i>**
-** </div>**
-** <h2 id="user-email-display" class="text-lg font-semibold mb-2">User Email</h2>**
-** <div class="flex justify-around mt-6 border-t border-white/10 pt-6">**
-** <div><p class="text-gray-400 text-xs">COINS</p><p id="profile-coins" class="font-bold text-pink-500 text-xl">0</p></div>**
-** <div><p class="text-gray-400 text-xs">STATUS</p><p class="font-bold text-green-500 text-xl">VIP</p></div>**
-** </div>**
-** <button onclick="auth.signOut()" class="mt-10 text-red-500 font-bold"><i class="fas fa-sign-out-alt mr-2"></i>LOGOUT</button>**
-** </div>**
-**</div>**
 
+        <div id="profile-page" class="page px-6">
+            <div class="glass-panel p-8 text-center mt-10">
+                <div class="w-24 h-24 bg-pink-600 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl font-bold shadow-lg">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h2 id="user-email-display" class="text-lg font-semibold mb-2">User Email</h2>
+                <div class="flex justify-around mt-6 border-t border-white/10 pt-6">
+                    <div><p class="text-gray-400 text-xs">COINS</p><p id="profile-coins" class="font-bold text-pink-500 text-xl">0</p></div>
+                    <div><p class="text-gray-400 text-xs">STATUS</p><p class="font-bold text-green-500 text-xl">VIP</p></div>
+                </div>
+                <button onclick="auth.signOut()" class="mt-10 w-full bg-red-600/10 p-4 rounded-xl text-red-500 font-bold border border-red-500/20">
+                    <i class="fas fa-sign-out-alt mr-2"></i> LOGOUT
+                </button>
+            </div>
+        </div>
 
         <div id="admin-panel" class="hidden fixed inset-0 z-[300] bg-gray-900 overflow-y-auto p-4">
-            <div class="flex justify-between items-center mb-6 sticky top-0 bg-gray-900 pb-4 border-b border-gray-800 pt-4">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
                 <h2 class="text-2xl font-bold text-red-500">ADMIN CONTROL</h2>
                 <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="bg-gray-700 px-4 py-2 rounded">Close</button>
             </div>
-            <h3 class="font-bold text-yellow-500 mb-2">Pending Bank Slips</h3>
-            <div id="admin-slips" class="space-y-2 mb-4 text-sm"></div>
+            <div id="admin-slips" class="space-y-4"></div>
         </div>
 
         <nav class="fixed bottom-0 w-full bg-black/80 backdrop-blur-xl border-t border-white/10 flex justify-around items-center py-4 z-40">
-            <i onclick="showPage('home')" class="fas fa-home text-xl text-pink-500 cursor-pointer"></i>
-            <div onclick="startLive()" class="bg-pink-600 w-14 h-14 rounded-full -mt-10 border-4 border-black shadow-lg shadow-pink-600/50 flex items-center justify-center cursor-pointer">
+            <i onclick="showPage('home')" id="nav-home" class="fas fa-home text-xl text-pink-500 cursor-pointer transition"></i>
+            <div onclick="startLive()" class="bg-pink-600 w-14 h-14 rounded-full -mt-10 border-4 border-black shadow-lg shadow-pink-600/50 flex items-center justify-center cursor-pointer active:scale-90 transition">
                 <i class="fas fa-video text-white text-xl"></i>
             </div>
-            <i onclick="showPage('wallet')" class="fas fa-wallet text-xl text-gray-400 cursor-pointer"></i>
+            <i onclick="showPage('wallet')" id="nav-wallet" class="fas fa-wallet text-xl text-gray-400 cursor-pointer transition"></i>
+            <i onclick="showPage('profile')" id="nav-profile" class="fas fa-user-circle text-xl text-gray-400 cursor-pointer transition"></i>
         </nav>
-        **<i onclick="showPage('profile')" class="fas fa-user-circle text-xl text-gray-400 cursor-pointer"></i>**
+    </div>
 
+    <div id="live-room" class="hidden fixed inset-0 bg-black z-[100] flex flex-col">
+        <div id="video-grid" class="flex-1 w-full relative"></div>
+        
+        <div class="absolute bottom-0 w-full p-6 bg-gradient-to-t from-black via-black/70 to-transparent z-[110]">
+            <div id="live-chat" class="h-40 overflow-y-auto mb-4 space-y-2 text-sm drop-shadow-lg custom-scrollbar"></div>
+            <div class="flex items-center gap-3 relative">
+                <input id="chat-msg" type="text" placeholder="Say hi..." class="flex-1 bg-white/10 p-3 rounded-full border border-white/20 outline-none text-white">
+                <button onclick="toggleGifts()" class="bg-pink-600 p-4 rounded-full shadow-lg active:scale-95"><i class="fas fa-gift"></i></button>
+                <button onclick="endLive()" class="bg-red-600 p-4 rounded-full active:scale-95"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+
+        <div id="gift-box" class="hidden absolute bottom-24 left-4 right-4 glass-panel z-[120] border-t-2 border-pink-600">
+            <div class="p-2 border-b border-white/10 text-center"><span class="text-[10px] font-bold text-pink-500 uppercase">Select Gift</span></div>
+            <div class="grid grid-cols-4 gap-3 p-4 max-h-60 overflow-y-auto custom-scrollbar">
+                <div onclick="sendGift('Rose', 10, '🌹')" class="text-center p-2 hover:bg-white/10 rounded-xl cursor-pointer">
+                    <span class="text-2xl">🌹</span><p class="text-[10px] mt-1 text-pink-300">10</p>
+                </div>
+                <div onclick="sendGift('Kiss', 50, '💋')" class="text-center p-2 hover:bg-white/10 rounded-xl cursor-pointer">
+                    <span class="text-2xl">💋</span><p class="text-[10px] mt-1 text-pink-300">50</p>
+                </div>
+                <div onclick="sendGift('Chocolate', 150, '🍫')" class="text-center p-2 hover:bg-white/10 rounded-xl cursor-pointer">
+                    <span class="text-2xl">🍫</span><p class="text-[10px] mt-1 text-pink-300">150</p>
+                </div>
+                <div onclick="sendGift('Ring', 1000, '💍')" class="text-center p-2 hover:bg-white/10 rounded-xl cursor-pointer">
+                    <span class="text-2xl">💍</span><p class="text-[10px] mt-1 text-pink-300">1000</p>
+                </div>
+            </div>
+        </div>
+        <div id="gift-animation-container" class="fixed inset-0 pointer-events-none z-[200]"></div>
     </div>
 
     <script>
-        // 1. FIREBASE CONFIGURATION
+        // 1. FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBwDUe5E8qRY1dbZzUQJu9eCAKBS7YSHVU",
             authDomain: "live-e6771.firebaseapp.com",
             projectId: "live-e6771",
             storageBucket: "live-e6771.firebasestorage.app",
             messagingSenderId: "570901004231",
-            appId: "1:570901004231:web:220679cf41cf55b98023e2",
-            measurementId: "G-GTQ7MLCQZH"
+            appId: "1:570901004231:web:220679cf41cf55b98023e2"
         };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
         const storage = firebase.storage();
 
-        // 2. AGORA CONFIGURATION
+        // 2. AGORA CONFIG
         const AGORA_APP_ID = 'd369ed90f2c04b599b9e680fbe3ca788';
         let agoraClient = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
         let localTracks = [];
-
         let currentUser = null;
         let currentCoins = 0;
-        let tapCount = 0;
-        let tapTimer = null;
-        // මේ කොටසින් වෙන්නේ පේජ් එක Refresh කළත් ඔයා ලොග් වෙලා ඉන්නවාද කියලා පරීක්ෂා කරන එකයි
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        // පරිශීලකයා කලින් ලොග් වී සිටී නම් කෙලින්ම App එක පෙන්වන්න
-        setupApp(user);
-    } else {
-        // ලොග් වී නැතිනම් Login Page එක පෙන්වන්න
-        document.getElementById('login-page').style.display = 'flex';
-        document.getElementById('app-content').classList.add('hidden');
-    }
-});
 
-        // --- AUTHENTICATION ---
+        // AUTH LISTENER
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                setupApp(user);
+            } else {
+                document.getElementById('login-page').style.display = 'flex';
+                document.getElementById('app-content').classList.add('hidden');
+            }
+        });
+
         async function handleLogin() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const errBox = document.getElementById('login-error');
+            if(!email || !password) return errBox.innerText = "Please fill all fields.";
             
-            if(!email || !password) { errBox.innerText = "Fill all fields."; return; }
-            errBox.innerText = "Connecting to Galaxy...";
-
             try {
-                const cred = await auth.signInWithEmailAndPassword(email, password);
-                setupApp(cred.user);
+                await auth.signInWithEmailAndPassword(email, password);
             } catch (error) {
-                // Auto Register if user not found
                 try {
                     const cred = await auth.createUserWithEmailAndPassword(email, password);
-                    await db.collection('profiles').doc(cred.user.uid).set({ email: email, coins: 0 });
-                    setupApp(cred.user);
-                } catch (regError) {
-                    errBox.innerText = regError.message;
-                }
+                    await db.collection('profiles').doc(cred.user.uid).set({ email, coins: 0 });
+                } catch (regError) { errBox.innerText = regError.message; }
             }
         }
 
@@ -251,197 +217,120 @@ auth.onAuthStateChanged((user) => {
             currentUser = user;
             document.getElementById('login-page').style.display = 'none';
             document.getElementById('app-content').classList.remove('hidden');
+            document.getElementById('user-email-display').innerText = user.email;
             
-            // Real-time coin updates
             db.collection('profiles').doc(user.uid).onSnapshot(doc => {
                 if(doc.exists) {
                     currentCoins = doc.data().coins;
                     document.getElementById('coin-balance').innerText = currentCoins;
+                    document.getElementById('profile-coins').innerText = currentCoins;
                 }
             });
-            **// පේළි අංක 244 අවට ඇතුළත් කරන්න**
-**document.getElementById('user-email-display').innerText = user.email;**
-**document.getElementById('profile-coins').innerText = currentCoins;**
-
         }
 
-        // --- UI UTILS ---
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.getElementById(pageId + '-page').classList.add('active-page');
+            
+            // Nav Icon Colors
+            document.querySelectorAll('nav i').forEach(icon => icon.classList.replace('text-pink-500', 'text-gray-400'));
+            const activeIcon = document.getElementById('nav-' + pageId);
+            if(activeIcon) activeIcon.classList.replace('text-gray-400', 'text-pink-500');
         }
 
-        function toggleGifts() { document.getElementById('gift-box').classList.toggle('hidden'); }
-
-        // --- LIVE VIDEO (AGORA) WITH ERROR FIX ---
-async function startLive() {
-    const liveRoom = document.getElementById('live-room');
-    liveRoom.classList.remove('hidden');
-    
-    try {
-        // 1. Join Channel
-        await agoraClient.join(AGORA_APP_ID, "main_room", null, currentUser.uid);
-        
-        // 2. Create Tracks (මෙතනදී තමයි කැමරාව ඉල්ලන්නේ)
-        // මයික්‍රෆෝනය හෝ කැමරාවෙන් එකක් නැති වුණත් වැඩ කරන විදියට මෙතන වෙනස් කළා
-        localTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
-            { encoderConfig: "720p_1" }, 
-            { position: 'front' }
-        ).catch(err => {
-            console.error("Permission Error:", err);
-            throw new Error("කැමරාවට හෝ මයික්‍රෆෝනයට අවසර ලබා දිය නොහැක. කරුණාකර Settings පරීක්ෂා කරන්න.");
-        });
-
-        // 3. Play video
-        const videoContainer = document.getElementById('video-grid');
-        videoContainer.innerHTML = ''; // කලින් තිබුණ දේවල් අයින් කරන්න
-        localTracks[1].play(videoContainer);
-        
-        // 4. Publish
-        await agoraClient.publish(localTracks);
-        
-        document.getElementById('live-chat').innerHTML += `<p class="text-green-400"><b>System:</b> Live Started!</p>`;
-        
-    } catch (e) {
-        console.error(e);
-        alert(e.message);
-        endLive(); // Error එකක් ආවොත් ලයිව් රූම් එක වහන්න
-    }
-}
-
+        async function startLive() {
+            document.getElementById('live-room').classList.remove('hidden');
+            try {
+                await agoraClient.join(AGORA_APP_ID, "main_room", null, currentUser.uid);
+                localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
+                localTracks[1].play('video-grid');
+                await agoraClient.publish(localTracks);
+            } catch (e) { alert("Permission Denied!"); endLive(); }
+        }
 
         function endLive() {
             localTracks.forEach(track => { track.stop(); track.close(); });
             agoraClient.leave();
             document.getElementById('live-room').classList.add('hidden');
-            document.getElementById('gift-box').classList.add('hidden');
         }
 
-        // --- GIFTS LOGIC ---
+        // GIFTS SYSTEM
+        function toggleGifts() { document.getElementById('gift-box').classList.toggle('hidden'); }
+
         async function sendGift(name, price, emoji) {
-            if (currentCoins < price) return alert("Insufficient Coins! Top up first.");
+            if (currentCoins < price) return alert("Insufficient coins!");
             
-            // Deduct coins in Firestore
             await db.collection('profiles').doc(currentUser.uid).update({
                 coins: firebase.firestore.FieldValue.increment(-price)
             });
 
-            // Play Animation
+            // Animation
             const container = document.getElementById('gift-animation-container');
-            const animEl = document.createElement('div');
-            animEl.className = 'gift-animate';
-            animEl.innerHTML = emoji;
-            container.appendChild(animEl);
-            setTimeout(() => animEl.remove(), 2000);
+            const el = document.createElement('div');
+            el.className = 'gift-animate'; el.innerHTML = emoji;
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 2000);
 
-            // Update Chat
-            const chat = document.getElementById('live-chat');
-            chat.innerHTML += `<p class="text-pink-400"><b>Me:</b> Sent ${name} ${emoji}</p>`;
-            chat.scrollTop = chat.scrollHeight;
+            document.getElementById('live-chat').innerHTML += `<p class="text-pink-400"><b>Me:</b> Sent ${name} ${emoji}</p>`;
             toggleGifts();
         }
 
-        // --- PAYPAL INTEGRATION ---
-        paypal.Buttons({
-            createOrder: (data, actions) => {
-                return actions.order.create({
-                    purchase_units: [{ amount: { value: '5.00' } }] // $5 payment
-                });
-            },
-            onApprove: (data, actions) => {
-                return actions.order.capture().then(() => {
-                    db.collection('profiles').doc(currentUser.uid).update({
-                        coins: firebase.firestore.FieldValue.increment(500) // Gives 500 coins
-                    });
-                    alert("Payment Success! 500 Coins added to your wallet.");
-                });
-            }
-        }).render('#paypal-button-container');
-
-        // --- BANK DEPOSIT (FIREBASE STORAGE) ---
         async function processDeposit() {
             const amt = document.getElementById('dep-amount').value;
             const file = document.getElementById('dep-slip').files[0];
-            if(!amt || !file) return alert("Missing amount or slip file!");
+            if(!amt || !file) return alert("Fill all fields!");
             
-            alert("Uploading slip... Please wait.");
-            try {
-                const fileName = `slips/${Date.now()}_${currentUser.uid}.png`;
-                const storageRef = storage.ref(fileName);
-                await storageRef.put(file);
-                const url = await storageRef.getDownloadURL();
-
-                await db.collection('transactions').add({
-                    user_id: currentUser.uid,
-                    email: currentUser.email,
-                    amount: amt,
-                    slip_url: url,
-                    status: 'pending',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                alert("Bank Slip Submitted Successfully!");
-                document.getElementById('dep-amount').value = '';
-                document.getElementById('dep-slip').value = '';
-            } catch (error) {
-                alert("Upload failed: " + error.message);
-            }
+            const ref = storage.ref(`slips/${Date.now()}_${currentUser.uid}.png`);
+            await ref.put(file);
+            const url = await ref.getDownloadURL();
+            await db.collection('transactions').add({
+                user_id: currentUser.uid, email: currentUser.email, amount: amt, slip_url: url, status: 'pending'
+            });
+            alert("Deposit submitted!");
         }
 
-        // --- ADMIN PANEL ---
+        // ADMIN ACCESS
+        let tapCount = 0, tapTimer = null;
         function secretAdminCheck() {
-            tapCount++;
-            clearTimeout(tapTimer);
-            tapTimer = setTimeout(() => { tapCount = 0; }, 2000); // 2 seconds to tap 5 times
+            tapCount++; clearTimeout(tapTimer);
+            tapTimer = setTimeout(() => tapCount = 0, 2000);
             if (tapCount === 5) {
-                tapCount = 0;
-                const p = prompt("Enter Admin Password:");
-                if(p === "admin123") {
+                if(prompt("Admin Password:") === "admin123") {
                     document.getElementById('admin-panel').classList.remove('hidden');
                     loadAdminData();
-                } else {
-                    alert("Incorrect Password!");
                 }
             }
         }
 
         async function loadAdminData() {
-            const slipsDiv = document.getElementById('admin-slips');
-            slipsDiv.innerHTML = "Loading...";
-            
-            const snapshot = await db.collection('transactions').where('status', '==', 'pending').get();
-            if (snapshot.empty) {
-                slipsDiv.innerHTML = "No pending slips.";
-                return;
-            }
-
+            const snap = await db.collection('transactions').where('status','==','pending').get();
             let html = "";
-            snapshot.forEach(doc => {
+            snap.forEach(doc => {
                 const t = doc.data();
-                html += `
-                <div class="bg-white/5 p-3 rounded mb-2 border border-white/10">
-                    <div class="flex justify-between mb-2">
-                        <span class="text-blue-400">${t.email}</span>
-                        <span class="text-green-400 font-bold">LKR ${t.amount}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <a href="${t.slip_url}" target="_blank" class="bg-blue-600 px-3 py-1 rounded w-1/2 text-center">View Slip</a>
-                        <button onclick="approveSlip('${doc.id}', ${t.amount}, '${t.user_id}')" class="bg-green-600 px-3 py-1 rounded w-1/2">Approve</button>
+                html += `<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                    <p class="text-xs text-blue-400">${t.email} - LKR ${t.amount}</p>
+                    <div class="flex gap-2 mt-2">
+                        <a href="${t.slip_url}" target="_blank" class="bg-blue-600 px-3 py-1 rounded text-xs">View Slip</a>
+                        <button onclick="approveSlip('${doc.id}', ${t.amount}, '${t.user_id}')" class="bg-green-600 px-3 py-1 rounded text-xs">Approve</button>
                     </div>
                 </div>`;
             });
-            slipsDiv.innerHTML = html;
+            document.getElementById('admin-slips').innerHTML = html || "No pending slips.";
         }
 
-        async function approveSlip(docId, amount, userId) {
-            await db.collection('transactions').doc(docId).update({ status: 'approved' });
-            // Add coins to user (Assuming 1 LKR = 1 Coin for Bank Transfer, change logic if needed)
-            await db.collection('profiles').doc(userId).update({
-                coins: firebase.firestore.FieldValue.increment(Number(amount))
-            });
-            alert("Slip Approved! Coins added to user.");
-            loadAdminData(); // Reload list
+        async function approveSlip(id, amt, uid) {
+            await db.collection('transactions').doc(id).update({ status: 'approved' });
+            await db.collection('profiles').doc(uid).update({ coins: firebase.firestore.FieldValue.increment(Number(amt)) });
+            alert("Approved!"); loadAdminData();
         }
+
+        paypal.Buttons({
+            createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: '5.00' } }] }),
+            onApprove: (data, actions) => actions.order.capture().then(() => {
+                db.collection('profiles').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(500) });
+                alert("500 Coins added via PayPal!");
+            })
+        }).render('#paypal-button-container');
     </script>
 </body>
 </html>
