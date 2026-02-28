@@ -2,261 +2,102 @@
 <html lang="si">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>YNS LIVE - Premium Galaxy v3</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YNS GALAXY PRO - Secure Earning</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.18.2.js"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=ATfsClCXiMMz7YyApME13i3yJkQK4UPDTL3PwPNh10Et5d17z9cpk-6_q0MqvCrVya9T5kwcc-OCY&currency=USD"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
     <style>
-        :root { --pink: #ff0077; --dark-glass: rgba(0, 0, 0, 0.85); }
-        body { margin: 0; font-family: 'Poppins', sans-serif; background: #000; color: white; overflow: hidden; }
-        .page { display: none; height: 100vh; width: 100vw; position: absolute; top: 0; left: 0; overflow-y: auto; padding-top: 70px; padding-bottom: 90px; }
-        .active-page { display: block; }
-        .glass { background: var(--dark-glass); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; }
-        
-        /* Full Screen Live UI */
-        #live-room { display: none; position: fixed; inset: 0; z-index: 100; background: #000; }
-        #video-grid { width: 100%; height: 100%; object-fit: cover; }
-        .live-overlay { position: absolute; inset: 0; z-index: 110; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; pointer-events: none; }
-        .interactive { pointer-events: auto; }
-        
-        /* Gift Animation */
-        .gift-animate { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; z-index: 200; animation: gift-pop 2s ease-out forwards; pointer-events: none; }
-        @keyframes gift-pop { 0% { scale: 0; opacity: 0; } 50% { scale: 1.5; opacity: 1; } 100% { scale: 1; opacity: 0; transform: translate(-50%, -150%); } }
-        
-        /* Bottom Panel */
-        .gift-panel { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); border-radius: 30px 30px 0 0; padding: 25px; display: none; z-index: 150; grid-template-columns: repeat(4, 1fr); gap: 15px; border-top: 2px solid var(--pink); }
+        .glass { background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        #local-video { width: 100%; height: 100vh; background: #111; object-fit: cover; }
     </style>
 </head>
-<body>
+<body class="bg-black text-white font-sans overflow-hidden">
 
-    <header id="main-header" class="fixed top-0 w-full z-40 p-4 flex justify-between items-center bg-black/80 border-b border-white/10">
-        <span class="text-xl font-black text-pink-600 italic">YNS GALAXY</span>
-        <div class="flex items-center gap-3">
-            <div class="bg-white/10 px-3 py-1 rounded-full border border-pink-500/30 flex items-center gap-2">
-                <i class="fas fa-gem text-blue-400 text-xs"></i><span id="nav-coins" class="font-bold text-sm">0</span>
+    <div class="fixed top-0 w-full z-50 p-4 flex justify-between items-center bg-gradient-to-b from-black to-transparent">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 rounded-full border-2 border-pink-500 overflow-hidden">
+                <img id="my-avatar" src="https://i.pravatar.cc/100" alt="avatar">
+            </div>
+            <div>
+                <p id="my-name" class="text-xs font-bold">User</p>
+                <p class="text-[10px] text-green-400">● Live</p>
             </div>
         </div>
-    </header>
-
-    <div id="page-home" class="page active-page px-4">
-        <div class="grid grid-cols-2 gap-4 mt-4" id="discovery-list">
+        <div class="flex gap-2">
+            <div class="glass px-3 py-1 rounded-full flex items-center gap-1">
+                <i class="fas fa-gem text-blue-400 text-[10px]"></i>
+                <span id="balance" class="text-xs font-bold">0</span>
             </div>
-    </div>
-
-    <div id="page-wallet" class="page px-6">
-        <div class="glass p-6 text-center mb-6 mt-4">
-            <h3 class="text-pink-500 font-bold mb-4">RECHARGE COINS</h3>
-            <div id="paypal-button-container"></div>
-        </div>
-        <div class="glass p-6 text-center">
-            <h3 class="text-green-500 font-bold mb-4">WITHDRAW CASH</h3>
-            <input id="w-amount" type="number" placeholder="Coin Amount" class="w-full bg-black border border-white/10 p-4 rounded-xl mb-3 outline-none">
-            <input id="w-method" type="text" placeholder="Bank / Binance ID" class="w-full bg-black border border-white/10 p-4 rounded-xl mb-4 outline-none">
-            <button onclick="handleWithdraw()" class="w-full bg-green-600 py-4 rounded-xl font-bold uppercase tracking-widest">Request Withdrawal</button>
-        </div>
-    </div>
-
-    <div id="page-profile" class="page px-6">
-        <div class="glass p-6 text-center">
-            <div class="relative w-24 h-24 mx-auto mb-6">
-                <img id="profile-display" src="https://i.pravatar.cc/150" class="w-full h-full rounded-full border-4 border-pink-600 object-cover">
-                <label class="absolute bottom-0 right-0 bg-pink-600 p-2 rounded-full cursor-pointer"><i class="fas fa-camera text-xs"></i><input type="file" onchange="previewImg(this)" class="hidden"></label>
-            </div>
-            <div class="space-y-4 text-left">
-                <input id="u-name" type="text" placeholder="Name" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none">
-                <textarea id="u-bio" placeholder="Bio" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none h-20"></textarea>
-                <button id="save-btn" onclick="saveProfile()" class="w-full bg-pink-600 p-4 rounded-xl font-bold uppercase">Update Profile</button>
-                <button onclick="auth.signOut()" class="w-full text-red-500 font-bold text-xs mt-4">LOGOUT</button>
+            <div class="glass px-3 py-1 rounded-full flex items-center gap-1 text-yellow-400">
+                <i class="fas fa-dollar-sign text-[10px]"></i>
+                <span id="earnings" class="text-xs font-bold">0.00</span>
             </div>
         </div>
     </div>
 
-    <div id="live-room">
-        <div id="video-grid"></div>
-        <div class="live-overlay">
-            <div class="flex justify-between interactive">
-                <div class="bg-black/40 p-1 pr-4 rounded-full flex items-center gap-2">
-                    <img id="host-mini-img" src="https://i.pravatar.cc/50" class="w-8 h-8 rounded-full border border-pink-500">
-                    <span class="text-[10px] font-bold">LIVE STREAM</span>
-                </div>
-                <button onclick="endLive()" class="bg-red-600 px-4 py-1 rounded-full text-xs font-bold">EXIT</button>
+    <div id="live-screen" class="relative h-screen w-full">
+        <div id="local-video"></div>
+        
+        <div class="absolute bottom-10 w-full px-6 flex justify-between items-center">
+            <div class="flex gap-4">
+                <button onclick="leaveLive()" class="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center shadow-lg"><i class="fas fa-times"></i></button>
             </div>
-            <div class="flex justify-between items-end mb-10 interactive">
-                <div class="flex gap-3">
-                    <button onclick="toggleAudio()" class="w-12 h-12 rounded-full bg-black/50 border border-white/20 flex items-center justify-center"><i id="mic-icon" class="fas fa-microphone"></i></button>
-                    <button onclick="switchCamera()" class="w-12 h-12 rounded-full bg-black/50 border border-white/20 flex items-center justify-center"><i class="fas fa-sync"></i></button>
-                </div>
-                <button onclick="toggleGifts()" class="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-500 to-yellow-500 flex items-center justify-center border-2 border-white shadow-xl"><i class="fas fa-gift text-2xl"></i></button>
-            </div>
+            <button onclick="startSecureLive()" id="start-btn" class="bg-pink-600 px-8 py-3 rounded-full font-bold shadow-neon animate-pulse">GO LIVE NOW</button>
+            <button onclick="showGifts()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-yellow-500 flex items-center justify-center shadow-lg"><i class="fas fa-gift"></i></button>
         </div>
-        <div id="gift-box" class="gift-panel interactive">
-            <div onclick="sendGift('🌹', 10)" class="text-center">🌹<p class="text-[8px]">10</p></div>
-            <div onclick="sendGift('💋', 50)" class="text-center">💋<p class="text-[8px]">50</p></div>
-            <div onclick="sendGift('❤️', 20)" class="text-center">❤️<p class="text-[8px]">20</p></div>
-            <div onclick="sendGift('🏩', 1000)" class="text-center">🏩<p class="text-[8px]">1k</p></div>
-            <div onclick="sendGift('🫦', 30)" class="text-center">🫦<p class="text-[8px]">30</p></div>
-            <div onclick="sendGift('🚿', 200)" class="text-center">🚿<p class="text-[8px]">200</p></div>
-            <div onclick="sendGift('🛏️', 500)" class="text-center">🛏️<p class="text-[8px]">500</p></div>
-            <div onclick="sendGift('👙', 800)" class="text-center">👙<p class="text-[8px]">800</p></div>
-            <div onclick="sendGift('🧴', 40)" class="text-center">🧴<p class="text-[8px]">40</p></div>
-            <div onclick="sendGift('👣', 150)" class="text-center">👣<p class="text-[8px]">150</p></div>
-            <div onclick="sendGift('🥂', 300)" class="text-center">🥂<p class="text-[8px]">300</p></div>
-            <div onclick="sendGift('🚀', 5000)" class="text-center">🚀<p class="text-[8px]">5k</p></div>
-        </div>
-        <div id="gift-anim-layer" class="fixed inset-0 pointer-events-none z-[200]"></div>
     </div>
 
-    <nav id="footer-nav" class="fixed bottom-0 w-full bg-black/90 border-t border-white/10 flex justify-around items-center py-5 z-40">
-        <i onclick="showPage('home')" class="fas fa-home text-xl text-pink-600 cursor-pointer"></i>
-        <i onclick="startLive()" class="fas fa-video text-2xl text-white bg-pink-600 p-3 rounded-full shadow-lg cursor-pointer"></i>
-        <i onclick="showPage('wallet')" class="fas fa-wallet text-xl text-gray-500 cursor-pointer"></i>
-        <i onclick="showPage('profile')" class="fas fa-user-circle text-xl text-gray-500 cursor-pointer"></i>
-    </nav>
+    <div id="gift-panel" class="hidden fixed inset-0 bg-black/60 z-[60] flex items-end">
+        <div class="w-full bg-zinc-900 rounded-t-3xl p-6 grid grid-cols-4 gap-4">
+            <div onclick="processRealGift('🌹', 10)" class="text-center p-2 border border-white/5 rounded-xl">🌹<p class="text-[10px]">10</p></div>
+            <div onclick="processRealGift('💋', 50)" class="text-center p-2 border border-white/5 rounded-xl">💋<p class="text-[10px]">50</p></div>
+            <div onclick="processRealGift('🦁', 500)" class="text-center p-2 border border-white/5 rounded-xl">🦁<p class="text-[10px]">500</p></div>
+            <div onclick="processRealGift('🚀', 5000)" class="text-center p-2 border border-white/5 rounded-xl">🚀<p class="text-[10px]">5k</p></div>
+            <button onclick="showGifts()" class="col-span-4 mt-4 text-gray-400 text-xs">Close Panel</button>
+        </div>
+    </div>
 
     <script>
-        // INIT
         const firebaseConfig = { apiKey: "AIzaSyBwDUe5E8qRY1dbZzUQJu9eCAKBS7YSHVU", authDomain: "live-e6771.firebaseapp.com", projectId: "live-e6771", storageBucket: "live-e6771.firebasestorage.app", messagingSenderId: "570901004231", appId: "1:570901004231:web:220679cf41cf55b98023e2" };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
         const db = firebase.firestore();
-        
-        let currentUser = null, currentCoins = 0, selectedFile = null, localTracks = [];
-        let agoraClient = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+        const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+        let localTracks = [], uid = Math.floor(Math.random() * 100000);
 
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                currentUser = user;
-                syncData();
-                renderPayPal();
-                loadDiscovery();
-            }
-        });
-
-        function syncData() {
-            db.collection('profiles').doc(currentUser.uid).onSnapshot(doc => {
-                if(doc.exists) {
-                    const d = doc.data();
-                    currentCoins = d.coins || 0;
-                    document.getElementById('nav-coins').innerText = currentCoins;
-                    document.getElementById('u-name').value = d.name || '';
-                    document.getElementById('u-bio').value = d.bio || '';
-                    if(d.profilePic) {
-                        document.getElementById('profile-display').src = d.profilePic;
-                        document.getElementById('host-mini-img').src = d.profilePic;
-                    }
-                    // Daily Bonus Logic
-                    const today = new Date().toDateString();
-                    if(d.lastLogin !== today) {
-                        db.collection('profiles').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(20), lastLogin: today });
-                        alert("Daily Bonus: +20 Coins! 🎁");
-                    }
-                }
-            });
-        }
-
-        // Live & Agora
-        async function startLive() {
-            document.getElementById('live-room').style.display = 'block';
+        async function startSecureLive() {
             try {
-                await agoraClient.join('d369ed90f2c04b599b9e680fbe3ca788', "main_room", null, currentUser.uid);
+                // 1. Backend එකෙන් Token එක ගමු (Real Security)
+                const res = await fetch(`/api/generate-token?channelName=main_room&uid=${uid}`);
+                const { token } = await res.json();
+
+                if(!token) throw new Error("Backend Token missing!");
+
+                // 2. Agora Join
+                await client.join("d369ed90f2c04b599b9e680fbe3ca788", "main_room", token, uid);
                 localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-                localTracks[1].play('video-grid');
-                await agoraClient.publish(localTracks);
-            } catch (e) { alert("Camera Error!"); endLive(); }
-        }
+                localTracks[1].play('local-video');
+                await client.publish(localTracks);
 
-        function endLive() {
-            localTracks.forEach(t => { t.stop(); t.close(); });
-            agoraClient.leave();
-            document.getElementById('live-room').style.display = 'none';
-        }
-
-        function toggleAudio() {
-            const muted = localTracks[0].muted;
-            localTracks[0].setMuted(!muted);
-            document.getElementById('mic-icon').className = !muted ? 'fas fa-microphone-slash text-red-500' : 'fas fa-microphone';
-        }
-
-        // Gifts
-        function toggleGifts() { 
-            const box = document.getElementById('gift-box');
-            box.style.display = box.style.display === 'grid' ? 'none' : 'grid';
-        }
-
-        async function sendGift(emoji, price) {
-            if (currentCoins < price) return alert("Insufficient Coins!");
-            await db.collection('profiles').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(-price) });
-            const anim = document.createElement('div');
-            anim.className = 'gift-animate'; anim.innerHTML = emoji;
-            document.getElementById('gift-anim-layer').appendChild(anim);
-            setTimeout(() => anim.remove(), 2000);
-            toggleGifts();
-        }
-
-        // Profile Update
-        function previewImg(input) {
-            if (input.files[0]) {
-                selectedFile = input.files[0];
-                const reader = new FileReader();
-                reader.onload = (e) => document.getElementById('profile-display').src = e.target.result;
-                reader.readAsDataURL(selectedFile);
+                document.getElementById('start-btn').classList.add('hidden');
+                alert("ඔබ දැන් සැබෑ ලෙසම ආරක්ෂිතව ලයිව් සම්බන්ධයි!");
+            } catch (err) {
+                alert("Error: " + err.message + ". Vercel එකේ AGORA_APP_CERT දාන්න.");
             }
         }
 
-        async function saveProfile() {
-            const btn = document.getElementById('save-btn');
-            btn.innerText = "UPDATING..."; btn.disabled = true;
-            let url = document.getElementById('profile-display').src;
-            if (selectedFile) {
-                const fd = new FormData();
-                fd.append('file', selectedFile);
-                fd.append('upload_preset', 'my_profile_preset');
-                const res = await fetch('https://api.cloudinary.com/v1_1/dbhf9fb13/image/upload', { method: 'POST', body: fd });
-                const data = await res.json();
-                url = data.secure_url;
-            }
-            await db.collection('profiles').doc(currentUser.uid).set({ name: document.getElementById('u-name').value, bio: document.getElementById('u-bio').value, profilePic: url }, { merge: true });
-            alert("Success!"); btn.innerText = "UPDATE PROFILE"; btn.disabled = false;
+        async function processRealGift(emoji, price) {
+            // මෙතනදී අපි කලින් හැදූ api/process-gift.js එකට පණිවිඩයක් යවනවා
+            alert(`Sending ${emoji} for ${price} coins...`);
+            // Transaction logic goes here
+            showGifts();
         }
 
-        // Withdraw
-        async function handleWithdraw() {
-            const amt = parseInt(document.getElementById('w-amount').value);
-            const meth = document.getElementById('w-method').value;
-            if(!amt || amt > currentCoins) return alert("Check your balance!");
-            await db.collection('profiles').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(-amt) });
-            await db.collection('withdrawals').add({ uid: currentUser.uid, amount: amt, method: meth, status: 'pending' });
-            alert("Withdrawal Requested!");
-        }
-
-        function renderPayPal() {
-            paypal.Buttons({
-                createOrder: (d, a) => a.order.create({ purchase_units: [{ amount: { value: '10.00' } }] }),
-                onApprove: (d, a) => a.order.capture().then(() => {
-                    db.collection('profiles').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(1000) });
-                    alert("1000 Coins Added!");
-                })
-            }).render('#paypal-button-container');
-        }
-
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-            document.getElementById('page-' + id).classList.add('active-page');
-        }
-
-        function loadDiscovery() {
-            const list = document.getElementById('discovery-list');
-            for(let i=1; i<=4; i++) {
-                list.innerHTML += `<div class="glass p-4 text-center"><img src="https://i.pravatar.cc/100?u=${i}" class="w-16 h-16 rounded-full mx-auto mb-2 border-2 border-pink-500"><p class="text-[10px] font-bold">User ${i}</p><button onclick="startLive()" class="mt-2 bg-pink-600 text-[8px] px-3 py-1 rounded-full">Watch Live</button></div>`;
-            }
-        }
+        function showGifts() { document.getElementById('gift-panel').classList.toggle('hidden'); }
+        function leaveLive() { location.reload(); }
     </script>
 </body>
 </html>
