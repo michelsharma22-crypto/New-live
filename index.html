@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YNS GALAXY PRO - Secure Earning</title>
+    <title>YNS GALAXY PRO - Official</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -11,93 +11,95 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .glass { background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        #local-video { width: 100%; height: 100vh; background: #111; object-fit: cover; }
+        .active-tab { color: #ec4899; border-bottom: 2px solid #ec4899; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
     </style>
 </head>
-<body class="bg-black text-white font-sans overflow-hidden">
+<body class="bg-black text-white font-sans">
 
-    <div class="fixed top-0 w-full z-50 p-4 flex justify-between items-center bg-gradient-to-b from-black to-transparent">
-        <div class="flex items-center gap-2">
-            <div class="w-10 h-10 rounded-full border-2 border-pink-500 overflow-hidden">
-                <img id="my-avatar" src="https://i.pravatar.cc/100" alt="avatar">
-            </div>
-            <div>
-                <p id="my-name" class="text-xs font-bold">User</p>
-                <p class="text-[10px] text-green-400">● Live</p>
-            </div>
-        </div>
-        <div class="flex gap-2">
-            <div class="glass px-3 py-1 rounded-full flex items-center gap-1">
-                <i class="fas fa-gem text-blue-400 text-[10px]"></i>
-                <span id="balance" class="text-xs font-bold">0</span>
-            </div>
-            <div class="glass px-3 py-1 rounded-full flex items-center gap-1 text-yellow-400">
-                <i class="fas fa-dollar-sign text-[10px]"></i>
-                <span id="earnings" class="text-xs font-bold">0.00</span>
-            </div>
-        </div>
+    <div class="fixed bottom-0 w-full glass z-50 flex justify-around p-4 border-t border-white/10">
+        <button onclick="switchTab('home')" id="home-btn" class="active-tab text-xl"><i class="fas fa-home"></i></button>
+        <button onclick="switchTab('live')" id="live-btn" class="text-gray-400 text-xl"><i class="fas fa-video"></i></button>
+        <button onclick="switchTab('wallet')" id="wallet-btn" class="text-gray-400 text-xl"><i class="fas fa-wallet"></i></button>
+        <button onclick="switchTab('profile')" id="profile-btn" class="text-gray-400 text-xl"><i class="fas fa-user"></i></button>
     </div>
 
-    <div id="live-screen" class="relative h-screen w-full">
-        <div id="local-video"></div>
-        
-        <div class="absolute bottom-10 w-full px-6 flex justify-between items-center">
-            <div class="flex gap-4">
-                <button onclick="leaveLive()" class="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center shadow-lg"><i class="fas fa-times"></i></button>
+    <div id="tab-home" class="p-5 pb-24">
+        <h1 class="text-pink-500 italic font-black text-2xl mb-6">YNS GALAXY PRO</h1>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-zinc-900 p-4 rounded-3xl text-center">
+                <img src="https://i.pravatar.cc/150?u=1" class="w-20 h-20 rounded-full mx-auto border-2 border-pink-500 mb-2">
+                <p class="font-bold text-sm">User</p>
+                <button class="bg-pink-600 px-4 py-1 rounded-full text-[10px] mt-2 font-bold uppercase">Follow</button>
             </div>
-            <button onclick="startSecureLive()" id="start-btn" class="bg-pink-600 px-8 py-3 rounded-full font-bold shadow-neon animate-pulse">GO LIVE NOW</button>
-            <button onclick="showGifts()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-yellow-500 flex items-center justify-center shadow-lg"><i class="fas fa-gift"></i></button>
+            <div class="bg-zinc-900 p-4 rounded-3xl text-center">
+                <img src="https://i.pravatar.cc/150?u=2" class="w-20 h-20 rounded-full mx-auto border-2 border-pink-500 mb-2">
+                <p class="font-bold text-sm">Nadisha</p>
+                <button class="bg-pink-600 px-4 py-1 rounded-full text-[10px] mt-2 font-bold uppercase">Follow</button>
+            </div>
         </div>
+        <h2 class="text-gray-500 text-center font-bold text-xs mt-10 tracking-widest uppercase">Recharge Coins</h2>
     </div>
 
-    <div id="gift-panel" class="hidden fixed inset-0 bg-black/60 z-[60] flex items-end">
-        <div class="w-full bg-zinc-900 rounded-t-3xl p-6 grid grid-cols-4 gap-4">
-            <div onclick="processRealGift('🌹', 10)" class="text-center p-2 border border-white/5 rounded-xl">🌹<p class="text-[10px]">10</p></div>
-            <div onclick="processRealGift('💋', 50)" class="text-center p-2 border border-white/5 rounded-xl">💋<p class="text-[10px]">50</p></div>
-            <div onclick="processRealGift('🦁', 500)" class="text-center p-2 border border-white/5 rounded-xl">🦁<p class="text-[10px]">500</p></div>
-            <div onclick="processRealGift('🚀', 5000)" class="text-center p-2 border border-white/5 rounded-xl">🚀<p class="text-[10px]">5k</p></div>
-            <button onclick="showGifts()" class="col-span-4 mt-4 text-gray-400 text-xs">Close Panel</button>
+    <div id="tab-live" class="hidden h-screen bg-zinc-950 relative">
+        <div id="local-video" class="w-full h-full bg-black"></div>
+        <div class="absolute top-5 left-5 flex items-center gap-2">
+            <div class="bg-black/50 p-1 px-3 rounded-full flex items-center gap-2">
+                <span class="text-blue-400">💎 <span id="balance">30</span></span>
+            </div>
+        </div>
+        <div class="absolute bottom-32 w-full text-center px-10">
+            <button onclick="startSecureLive()" id="go-live-btn" class="bg-pink-600 w-full py-4 rounded-2xl font-black shadow-lg shadow-pink-500/20">GO LIVE NOW</button>
+        </div>
+        <button onclick="showGifts()" class="absolute bottom-32 right-5 w-14 h-14 bg-gradient-to-tr from-pink-500 to-yellow-500 rounded-full flex items-center justify-center shadow-xl"><i class="fas fa-gift text-xl"></i></button>
+    </div>
+
+    <div id="gift-panel" class="hidden fixed inset-0 bg-black/80 z-[60] flex items-end">
+        <div class="w-full bg-zinc-900 rounded-t-[40px] p-8 grid grid-cols-3 gap-6">
+            <div onclick="sendGift('🌹', 10)" class="text-center bg-white/5 p-4 rounded-3xl">🌹<p class="text-xs font-bold mt-1 text-gray-400">10</p></div>
+            <div onclick="sendGift('💎', 50)" class="text-center bg-white/5 p-4 rounded-3xl">💎<p class="text-xs font-bold mt-1 text-gray-400">50</p></div>
+            <div onclick="sendGift('🦁', 500)" class="text-center bg-white/5 p-4 rounded-3xl">🦁<p class="text-xs font-bold mt-1 text-gray-400">500</p></div>
+            <button onclick="showGifts()" class="col-span-3 text-gray-500 text-xs font-bold">CLOSE</button>
         </div>
     </div>
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyBwDUe5E8qRY1dbZzUQJu9eCAKBS7YSHVU", authDomain: "live-e6771.firebaseapp.com", projectId: "live-e6771", storageBucket: "live-e6771.firebasestorage.app", messagingSenderId: "570901004231", appId: "1:570901004231:web:220679cf41cf55b98023e2" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // CONFIG - Verify this App ID with your Agora Console
+        const AGORA_APP_ID = "d369ed90f2c04b599b9e680fbe3ca788"; 
+        
         const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
-        let localTracks = [], uid = Math.floor(Math.random() * 100000);
+        let localTracks = [];
+
+        function switchTab(tab) {
+            document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+            document.querySelectorAll('button[id$="-btn"]').forEach(el => el.classList.remove('active-tab'));
+            document.getElementById(tab + '-btn').classList.add('active-tab');
+        }
 
         async function startSecureLive() {
+            const uid = Math.floor(Math.random() * 100000);
             try {
-                // 1. Backend එකෙන් Token එක ගමු (Real Security)
+                // Backend එකෙන් ආරක්ෂිත Token එක ඉල්ලනවා
                 const res = await fetch(`/api/generate-token?channelName=main_room&uid=${uid}`);
-                const { token } = await res.json();
+                const data = await res.json();
 
-                if(!token) throw new Error("Backend Token missing!");
+                if (!data.token) throw new Error("Key/Certificate missing in Vercel!");
 
-                // 2. Agora Join
-                await client.join("d369ed90f2c04b599b9e680fbe3ca788", "main_room", token, uid);
+                await client.join(AGORA_APP_ID, "main_room", data.token, uid);
                 localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
                 localTracks[1].play('local-video');
                 await client.publish(localTracks);
 
-                document.getElementById('start-btn').classList.add('hidden');
-                alert("ඔබ දැන් සැබෑ ලෙසම ආරක්ෂිතව ලයිව් සම්බන්ධයි!");
+                document.getElementById('go-live-btn').classList.add('hidden');
+                alert("You are now LIVE and SECURE!");
             } catch (err) {
-                alert("Error: " + err.message + ". Vercel එකේ AGORA_APP_CERT දාන්න.");
+                alert("CAMERA ERROR: " + err.message + "\n\n1. Vercel එකට ගිහින් AGORA_APP_CERT variable එක දාලා Redeploy කරන්න.\n2. Browser Permission Allow කරන්න.");
             }
         }
 
-        async function processRealGift(emoji, price) {
-            // මෙතනදී අපි කලින් හැදූ api/process-gift.js එකට පණිවිඩයක් යවනවා
-            alert(`Sending ${emoji} for ${price} coins...`);
-            // Transaction logic goes here
-            showGifts();
-        }
-
         function showGifts() { document.getElementById('gift-panel').classList.toggle('hidden'); }
-        function leaveLive() { location.reload(); }
+        function sendGift(e, p) { alert(`Sending ${e}...`); showGifts(); }
     </script>
 </body>
 </html>
