@@ -2,28 +2,95 @@
 <html lang="si">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YNS GALAXY - FINAL FIX</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YNS GALAXY - PRO MAX</title>
+    
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    
     <script src="https://www.paypal.com/sdk/js?client-id=ATfsClCXiMMz7YyApME13i3yJkQK4UPDTL3PwPNh10Et5d17z9cpk-6_q0MqvCrVya9T5kwcc-OCY&currency=USD"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
     <style>
-        body { background: #000; color: white; }
-        .glass { background: rgba(30, 30, 30, 0.9); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .online-dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; display: inline-block; margin-right: 5px; box-shadow: 0 0 8px #22c55e; }
+        body { background: #000; color: white; font-family: sans-serif; overflow-x: hidden; }
+        .glass { background: rgba(20, 20, 20, 0.9); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .page { display: none; padding: 80px 20px 100px 20px; min-height: 100vh; }
+        .active-page { display: block; }
+        .online-dot { width: 12px; height: 12px; background: #22c55e; border-radius: 50%; position: absolute; top: 10px; right: 10px; box-shadow: 0 0 8px #22c55e; }
+        .offline-dot { width: 12px; height: 12px; background: #6b7280; border-radius: 50%; position: absolute; top: 10px; right: 10px; }
+        .gift-anim { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; font-size: 80px; animation: giftPop 1.5s ease-out forwards; pointer-events: none; }
+        @keyframes giftPop { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -80%) scale(1.5); } 100% { opacity: 0; transform: translate(-50%, -120%) scale(1); } }
     </style>
 </head>
-<body class="p-6">
-    <h1 class="text-pink-600 font-black italic text-2xl mb-6">YNS GALAXY PRO</h1>
-    <div id="user-list" class="grid grid-cols-2 gap-4"></div>
-    <div class="mt-8 border-t border-white/10 pt-6">
-        <h3 class="text-center text-sm mb-4 text-gray-400 font-bold">RECHARGE COINS</h3>
-        <div id="paypal-button-container"></div>
+<body>
+    <div id="gift-container"></div>
+
+    <header class="fixed top-0 w-full z-50 p-4 flex justify-between items-center bg-black/80 backdrop-blur-md border-b border-white/10">
+        <h1 class="text-pink-600 font-black italic text-xl">YNS GALAXY</h1>
+        <div class="bg-white/10 px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2">
+            💎 <span id="nav-coins">0</span>
+        </div>
+    </header>
+
+    <div id="page-home" class="page active-page">
+        <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Discovery Feed</h2>
+        <div id="user-list" class="grid grid-cols-2 gap-4"></div>
     </div>
 
+    <div id="page-live" class="page">
+        <div class="glass p-6 text-center">
+            <h2 class="font-bold mb-4 text-pink-500">Live & Gifts Simulation</h2>
+            <div class="w-full h-48 bg-zinc-900 rounded-xl mb-4 flex items-center justify-center border border-white/10">
+                <p class="text-gray-500"><i class="fas fa-video text-2xl mb-2"></i><br>Live Stream Area</p>
+            </div>
+            <h3 class="font-bold text-sm mb-3">Send Gifts</h3>
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="sendGift('🌹', 10)" class="bg-white/5 p-3 rounded-xl border border-white/10 active:border-pink-500">🌹<br><span class="text-[10px] text-gray-400">10 Coins</span></button>
+                <button onclick="sendGift('💎', 50)" class="bg-white/5 p-3 rounded-xl border border-white/10 active:border-pink-500">💎<br><span class="text-[10px] text-gray-400">50 Coins</span></button>
+                <button onclick="sendGift('🦁', 500)" class="bg-white/5 p-3 rounded-xl border border-white/10 active:border-pink-500">🦁<br><span class="text-[10px] text-gray-400">500 Coins</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-wallet" class="page">
+        <div class="glass p-6 mb-6">
+            <h3 class="text-center font-bold mb-4">Recharge Coins ($5.00)</h3>
+            <div id="paypal-button-container"></div>
+        </div>
+        <div class="glass p-6 text-center">
+            <h3 class="font-bold mb-4 text-green-400">Withdraw Coins</h3>
+            <input type="number" id="withdraw-amount" placeholder="Enter Coin Amount" class="w-full bg-black border border-white/20 p-3 rounded-xl mb-3 outline-none text-center">
+            <input type="text" id="withdraw-method" placeholder="Bank / Binance Pay ID" class="w-full bg-black border border-white/20 p-3 rounded-xl mb-4 outline-none text-center text-sm">
+            <button onclick="requestWithdraw()" class="bg-green-600 w-full py-3 rounded-xl font-bold">Request Withdrawal</button>
+        </div>
+    </div>
+
+    <div id="page-profile" class="page">
+        <div class="glass p-6 text-center">
+            <div class="relative inline-block mb-4">
+                <img id="profile-img" src="https://i.pravatar.cc/150" class="w-28 h-28 rounded-full border-4 border-pink-600 object-cover">
+                <input type="file" id="upload-photo" class="hidden" onchange="uploadPhoto(this)" accept="image/*">
+                <label for="upload-photo" class="absolute bottom-0 right-0 bg-pink-600 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border-2 border-black"><i class="fas fa-camera text-xs"></i></label>
+            </div>
+            <input id="user-name" type="text" placeholder="ඔබේ නම" class="bg-transparent text-center w-full font-bold outline-none text-2xl mb-2 border-b border-white/10 pb-2">
+            <input id="user-bio" type="text" placeholder="Bio එකක් ලියන්න" class="bg-transparent text-center w-full text-gray-400 outline-none text-sm italic border-b border-white/10 pb-2">
+            <button onclick="saveProfile()" class="mt-6 bg-pink-600 px-8 py-3 rounded-full text-sm font-bold w-full">SAVE PROFILE</button>
+            <button onclick="auth.signOut()" class="mt-4 text-red-500 text-xs font-bold w-full">LOGOUT</button>
+        </div>
+    </div>
+
+    <nav class="fixed bottom-0 w-full bg-black/90 border-t border-white/10 flex justify-around items-center py-4 z-50 backdrop-blur-lg">
+        <button onclick="switchPage('home')" class="text-gray-500 hover:text-pink-600 focus:text-pink-600"><i class="fas fa-home text-xl"></i></button>
+        <button onclick="switchPage('live')" class="text-gray-500 hover:text-pink-600 focus:text-pink-600"><i class="fas fa-video text-xl"></i></button>
+        <button onclick="switchPage('wallet')" class="text-gray-500 hover:text-pink-600 focus:text-pink-600"><i class="fas fa-wallet text-xl"></i></button>
+        <button onclick="switchPage('profile')" class="text-gray-500 hover:text-pink-600 focus:text-pink-600"><i class="fas fa-user-circle text-xl"></i></button>
+    </nav>
+
     <script>
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBwDUe5E8qRY1dbZzUQJu9eCAKBS7YSHVU",
             authDomain: "live-e6771.firebaseapp.com",
@@ -35,40 +102,183 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
+        const storage = firebase.storage();
 
-        auth.onAuthStateChanged(user => {
+        let currentUserDoc = null;
+
+        // Auth State & Core Logic
+        auth.onAuthStateChanged(async user => {
             if (user) {
-                db.collection('profiles').doc(user.uid).set({ online: true }, { merge: true });
-                window.onbeforeunload = () => db.collection('profiles').doc(user.uid).update({ online: false });
+                // Online Status Handle
+                const userRef = db.collection('profiles').doc(user.uid);
+                userRef.set({ online: true }, { merge: true });
+                window.onbeforeunload = () => userRef.update({ online: false });
+
+                // Check Daily Login Reward
+                const today = new Date().toDateString();
+                const docSnap = await userRef.get();
+                if(docSnap.exists) {
+                    const data = docSnap.data();
+                    if(data.lastLogin !== today) {
+                        userRef.update({
+                            coins: firebase.firestore.FieldValue.increment(50),
+                            lastLogin: today
+                        });
+                        alert("🎉 Daily Login Reward: 50 Coins Added!");
+                    }
+                } else {
+                    userRef.set({ coins: 0, lastLogin: today, name: 'New User' }, { merge: true });
+                }
+
+                // Load My Data (Coins, Profile)
+                userRef.onSnapshot(doc => {
+                    if(doc.exists) {
+                        const d = doc.data();
+                        currentUserDoc = d;
+                        document.getElementById('nav-coins').innerText = d.coins || 0;
+                        document.getElementById('user-name').value = d.name || "";
+                        document.getElementById('user-bio').value = d.bio || "";
+                        if(d.profilePic) document.getElementById('profile-img').src = d.profilePic;
+                    }
+                });
+
                 loadUsers();
-                renderPayPal();
+                renderPayPalBackend();
             }
         });
 
+        // Load Home Feed Users
         function loadUsers() {
             db.collection('profiles').onSnapshot(snap => {
                 const list = document.getElementById('user-list');
                 list.innerHTML = '';
                 snap.forEach(doc => {
-                    if(doc.id === auth.currentUser.uid) return;
+                    if(!auth.currentUser || doc.id === auth.currentUser.uid) return;
                     const d = doc.data();
                     list.innerHTML += `
-                        <div class="glass p-4 relative flex flex-col items-center">
-                            <span class="${d.online ? 'online-dot' : ''}"></span>
-                            <img src="${d.profilePic || 'https://i.pravatar.cc/100'}" class="w-16 h-16 rounded-full border-2 border-pink-600 mb-2">
-                            <p class="text-xs font-bold">${d.name || 'User'}</p>
-                            <button onclick="alert('Followed!')" class="mt-3 bg-pink-600 px-4 py-1 rounded-full text-[10px] font-bold">FOLLOW</button>
+                        <div class="glass p-4 relative flex flex-col items-center text-center">
+                            <div class="${d.online ? 'online-dot' : 'offline-dot'}"></div>
+                            <img src="${d.profilePic || 'https://i.pravatar.cc/100'}" class="w-16 h-16 rounded-full border-2 border-pink-600 mb-2 object-cover">
+                            <p class="text-xs font-bold truncate w-full">${d.name || 'User'}</p>
+                            <p class="text-[10px] text-gray-500 mb-3 truncate w-full">${d.bio || 'No bio'}</p>
+                            <button class="bg-pink-600 px-4 py-1.5 rounded-full text-[10px] font-black w-full">FOLLOW</button>
                         </div>`;
                 });
             });
         }
 
-        function renderPayPal() {
-            document.getElementById('paypal-button-container').innerHTML = '';
+        // Profile Functions
+        async function saveProfile() {
+            if(!auth.currentUser) return;
+            await db.collection('profiles').doc(auth.currentUser.uid).update({
+                name: document.getElementById('user-name').value,
+                bio: document.getElementById('user-bio').value
+            });
+            alert("Profile Updated Successfully!");
+        }
+
+        function uploadPhoto(input) {
+            const file = input.files[0];
+            if(!file || !auth.currentUser) return;
+            
+            document.getElementById('profile-img').style.opacity = '0.5'; // Uploading visual
+            const ref = storage.ref('profiles/' + auth.currentUser.uid);
+            
+            ref.put(file).then(() => {
+                ref.getDownloadURL().then(url => {
+                    db.collection('profiles').doc(auth.currentUser.uid).update({ profilePic: url });
+                    document.getElementById('profile-img').src = url;
+                    document.getElementById('profile-img').style.opacity = '1';
+                });
+            }).catch(err => alert("Upload failed: " + err.message));
+        }
+
+        // Gifts System
+        function sendGift(emoji, cost) {
+            if(!currentUserDoc || currentUserDoc.coins < cost) {
+                alert("Not enough coins!"); return;
+            }
+            
+            // Animation
+            const el = document.createElement('div');
+            el.className = 'gift-anim';
+            el.innerText = emoji;
+            document.getElementById('gift-container').appendChild(el);
+            setTimeout(() => el.remove(), 1500);
+
+            // Deduct Coins
+            db.collection('profiles').doc(auth.currentUser.uid).update({
+                coins: firebase.firestore.FieldValue.increment(-cost)
+            });
+        }
+
+        // Withdraw Request
+        async function requestWithdraw() {
+            const amount = parseInt(document.getElementById('withdraw-amount').value);
+            const method = document.getElementById('withdraw-method').value;
+
+            if(!amount || amount <= 0 || !method) {
+                alert("Please enter valid amount and withdrawal method."); return;
+            }
+            if(!currentUserDoc || currentUserDoc.coins < amount) {
+                alert("Insufficient Coins for withdrawal!"); return;
+            }
+
+            // Deduct coins & create request
+            await db.collection('profiles').doc(auth.currentUser.uid).update({
+                coins: firebase.firestore.FieldValue.increment(-amount)
+            });
+            await db.collection('withdraw_requests').add({
+                userId: auth.currentUser.uid,
+                name: currentUserDoc.name,
+                amount: amount,
+                method: method,
+                status: 'pending',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            alert(`Withdrawal request for ${amount} coins submitted successfully!`);
+            document.getElementById('withdraw-amount').value = '';
+            document.getElementById('withdraw-method').value = '';
+        }
+
+        // Backend PayPal System
+        function renderPayPalBackend() {
+            const container = document.getElementById('paypal-button-container');
+            if(container.innerHTML !== '') return; // Prevent duplicate rendering
+
             paypal.Buttons({
-                createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: '5.00' } }] }),
-                onApprove: (data, actions) => actions.order.capture().then(() => alert('Coins Added!'))
+                createOrder: async function() {
+                    const res = await fetch('/api/create-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ amount: "5.00" })
+                    });
+                    const order = await res.json();
+                    return order.id;
+                },
+                onApprove: async function(data) {
+                    const res = await fetch('/api/capture-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            orderID: data.orderID,
+                            userId: auth.currentUser.uid 
+                        })
+                    });
+                    const result = await res.json();
+                    if(result.status === "COMPLETED" || result.success) {
+                        alert('Payment Success! Coins updated via Backend.');
+                    }
+                }
             }).render('#paypal-button-container');
+        }
+
+        // Navigation Switcher
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+            document.getElementById('page-' + pageId).classList.add('active-page');
+            window.scrollTo(0, 0);
         }
     </script>
 </body>
