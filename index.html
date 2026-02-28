@@ -3,170 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YNS LIVE - Premium Galaxy</title>
-    
+    <title>YNS GALAXY - LIVE STATUS</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-    
-    <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.18.2.js"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=ATfsClCXiMMz7YyApME13i3yJkQK4UPDTL3PwPNh10Et5d17z9cpk-6_q0MqvCrVya9T5kwcc-OCY&currency=USD"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
     <style>
-        :root { --neon-pink: #ff0077; --glass: rgba(0, 0, 0, 0.75); }
-        body {
-            margin: 0; font-family: 'Poppins', sans-serif;
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?q=80&w=2071');
-            background-size: cover; background-position: center; background-attachment: fixed;
-            color: white; overflow-x: hidden; user-select: none;
-        }
-        .glass-panel { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; }
-        .neon-text { text-shadow: 0 0 10px var(--neon-pink); }
-        .neon-btn { background: linear-gradient(45deg, var(--neon-pink), #ff00bb); box-shadow: 0 4px 15px rgba(255, 0, 119, 0.4); transition: 0.3s; }
-        .neon-btn:hover { box-shadow: 0 0 25px var(--neon-pink); transform: translateY(-2px); }
-        .page { display: none; min-height: 100vh; padding-top: 80px; padding-bottom: 90px; }
-        .active-page { display: block; }
-        #video-grid { height: 70vh; background: #000; border-radius: 20px; overflow: hidden; position: relative; }
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #ff0077; border-radius: 10px; }
-        
-        /* Gift Animation */
-        @keyframes gift-pop {
-            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
-            50% { transform: scale(1.5) rotate(10deg); opacity: 1; }
-            100% { transform: scale(1.2) rotate(0deg); opacity: 0; }
-        }
-        .gift-animate { animation: gift-pop 2s ease-out forwards; position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; z-index: 200; pointer-events: none; text-shadow: 0 0 30px rgba(255, 0, 119, 0.8); }
+        body { background: #000; color: white; font-family: sans-serif; }
+        .glass { background: rgba(30, 30, 30, 0.9); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .online-dot { width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid #000; position: absolute; top: 5px; right: 5px; box-shadow: 0 0 8px #22c55e; }
+        .offline-dot { width: 12px; height: 12px; background: #6b7280; border-radius: 50%; border: 2px solid #000; position: absolute; top: 5px; right: 5px; }
     </style>
 </head>
-<body>
+<body class="p-4 pb-24">
 
-    <div id="login-page" class="flex flex-col items-center justify-center min-h-screen px-6 z-50 relative">
-        <div class="glass-panel p-8 w-full max-w-md text-center border-t-4 border-pink-600">
-            <h1 onclick="secretAdminCheck()" class="text-4xl font-bold neon-text mb-2 cursor-pointer">YNS LIVE</h1>
-            <p class="text-gray-400 text-sm mb-8 tracking-widest uppercase">Premium Dating & Live</p>
-            <div class="space-y-4">
-                <input id="email" type="email" placeholder="Email Address" class="w-full p-4 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-pink-500 transition text-white">
-                <input id="password" type="password" placeholder="Password" class="w-full p-4 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-pink-500 transition text-white">
-                <button onclick="handleLogin()" class="w-full neon-btn p-4 rounded-xl font-bold text-lg uppercase tracking-wider text-white">Join Galaxy</button>
-            </div>
-            <div id="login-error" class="text-red-500 text-xs mt-4 font-bold"></div>
+    <header class="flex justify-between items-center mb-6">
+        <h1 class="text-pink-600 font-black italic text-xl">YNS GALAXY</h1>
+        <div class="bg-white/10 px-3 py-1 rounded-full text-xs">💎 <span id="my-coins">0</span></div>
+    </header>
+
+    <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Online Users</h2>
+    
+    <div id="user-list" class="grid grid-cols-2 gap-4">
         </div>
-    </div>
-
-    <div id="app-content" class="hidden">
-        <header class="fixed top-0 w-full z-40 p-4 flex justify-between items-center bg-black/60 backdrop-blur-lg border-b border-white/10">
-            <span onclick="secretAdminCheck()" class="text-2xl font-black text-pink-600 cursor-pointer">YNS</span>
-            <div class="flex gap-3">
-                <div onclick="showPage('wallet')" class="bg-white/10 px-4 py-2 rounded-full border border-pink-500/30 flex items-center gap-2 cursor-pointer hover:bg-white/20">
-                    <i class="fas fa-gem text-blue-400"></i>
-                    <span id="coin-balance" class="font-bold">0</span>
-                </div>
-                <img src="https://i.pravatar.cc/100" class="w-10 h-10 rounded-full border-2 border-pink-600">
-            </div>
-        </header>
-
-        <div id="home-page" class="page active-page px-4">
-            <div class="glass-panel p-6 mb-20 text-center">
-                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=500" class="w-full h-48 object-cover rounded-xl mb-4">
-                <h3 class="text-xl font-bold mb-2">Welcome Back!</h3>
-                <p class="text-gray-400 text-sm mb-6">Start your live session and meet new people.</p>
-                <button onclick="startLive()" class="neon-btn px-10 py-4 rounded-full font-bold flex items-center gap-2 mx-auto">
-                    <i class="fas fa-video"></i> GO LIVE NOW
-                </button>
-            </div>
-        </div>
-
-        <div id="wallet-page" class="page px-6">
-            <h2 class="text-2xl font-bold mb-6 neon-text text-center">Top Up Coins</h2>
-            <div class="glass-panel p-6 mb-6">
-                <h3 class="text-blue-400 font-bold mb-4 text-center"><i class="fab fa-paypal mr-2"></i> PayPal Top Up</h3>
-                <div id="paypal-button-container"></div>
-            </div>
-            <div class="glass-panel p-6 border-l-4 border-yellow-500 mb-6">
-                <p class="text-gray-400 text-xs uppercase">Bank Account</p>
-                <p class="text-lg font-mono text-white">105057458082</p>
-                <p class="text-gray-300">J A Y S KAVINDA (Sampath Bank)</p>
-            </div>
-            <div class="glass-panel p-6 mb-20">
-                <input id="dep-amount" type="number" placeholder="Amount (LKR)" class="w-full p-4 bg-white/5 border border-white/10 rounded-xl mb-4 text-white">
-                <input id="dep-slip" type="file" class="w-full p-2 text-xs text-gray-400 mb-4">
-                <button onclick="processDeposit()" class="w-full bg-green-600 p-4 rounded-xl font-bold">SUBMIT SLIP</button>
-            </div>
-        </div>
-
-        <div id="profile-page" class="page px-6">
-            <div class="glass-panel p-8 text-center mt-10">
-                <div class="w-24 h-24 bg-pink-600 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl font-bold shadow-lg">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h2 id="user-email-display" class="text-lg font-semibold mb-2">User Email</h2>
-                <div class="flex justify-around mt-6 border-t border-white/10 pt-6">
-                    <div><p class="text-gray-400 text-xs">COINS</p><p id="profile-coins" class="font-bold text-pink-500 text-xl">0</p></div>
-                    <div><p class="text-gray-400 text-xs">STATUS</p><p class="font-bold text-green-500 text-xl">VIP</p></div>
-                </div>
-                <button onclick="auth.signOut()" class="mt-10 w-full bg-red-600/10 p-4 rounded-xl text-red-500 font-bold border border-red-500/20">
-                    <i class="fas fa-sign-out-alt mr-2"></i> LOGOUT
-                </button>
-            </div>
-        </div>
-
-        <div id="admin-panel" class="hidden fixed inset-0 z-[300] bg-gray-900 overflow-y-auto p-4">
-            <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
-                <h2 class="text-2xl font-bold text-red-500">ADMIN CONTROL</h2>
-                <button onclick="document.getElementById('admin-panel').classList.add('hidden')" class="bg-gray-700 px-4 py-2 rounded">Close</button>
-            </div>
-            <div id="admin-slips" class="space-y-4"></div>
-        </div>
-
-        <nav class="fixed bottom-0 w-full bg-black/80 backdrop-blur-xl border-t border-white/10 flex justify-around items-center py-4 z-40">
-            <i onclick="showPage('home')" id="nav-home" class="fas fa-home text-xl text-pink-500 cursor-pointer transition"></i>
-            <div onclick="startLive()" class="bg-pink-600 w-14 h-14 rounded-full -mt-10 border-4 border-black shadow-lg shadow-pink-600/50 flex items-center justify-center cursor-pointer active:scale-90 transition">
-                <i class="fas fa-video text-white text-xl"></i>
-            </div>
-            <i onclick="showPage('wallet')" id="nav-wallet" class="fas fa-wallet text-xl text-gray-400 cursor-pointer transition"></i>
-            <i onclick="showPage('profile')" id="nav-profile" class="fas fa-user-circle text-xl text-gray-400 cursor-pointer transition"></i>
-        </nav>
-    </div>
-
-    <div id="live-room" class="hidden fixed inset-0 bg-black z-[100] flex flex-col">
-        <div id="video-grid" class="flex-1 w-full relative"></div>
-        
-        <div class="absolute bottom-0 w-full p-6 bg-gradient-to-t from-black via-black/70 to-transparent z-[110]">
-            <div id="live-chat" class="h-40 overflow-y-auto mb-4 space-y-2 text-sm drop-shadow-lg custom-scrollbar"></div>
-            <div class="flex items-center gap-3 relative">
-                <input id="chat-msg" type="text" placeholder="Say hi..." class="flex-1 bg-white/10 p-3 rounded-full border border-white/20 outline-none text-white">
-                <button onclick="toggleGifts()" class="bg-pink-600 p-4 rounded-full shadow-lg active:scale-95"><i class="fas fa-gift"></i></button>
-                <button onclick="endLive()" class="bg-red-600 p-4 rounded-full active:scale-95"><i class="fas fa-times"></i></button>
-            </div>
-        </div>
-
-        <div id="gift-box" class="hidden absolute bottom-24 left-4 right-4 glass-panel z-[120] border-t-2 border-pink-600">
-            <div class="p-2 border-b border-white/10 text-center"><span class="text-[10px] font-bold text-pink-500 uppercase">Select Gift</span></div>
-            <div class="grid grid-cols-4 gap-3 p-4 max-h-60 overflow-y-auto custom-scrollbar">
-                <div onclick="sendGift('Rose', 10, '🌹')" class="text-center p-2 hover:bg-white/10 rounded-xl cursor-pointer">
-                    <span class="text-2xl">🌹</span><p class="text-[10px] mt-1 text-pink-300">10</p>
-                </div>
-                <div onclick="sendGift('Kiss', 50, '💋')" class="text-center p-2 hover:bg-white/10 rounded-xl cursor-pointer">
-                    <span class="text-2xl">💋</span><p class="text-[10px] mt-1 text-pink-300">50</p>
-                </div>
-                <div onclick="sendGift('Chocolate', 150, '🍫')" class="text-center p-2 hover:bg-white/10 rounded-xl cursor-pointer">
-                    <span class="text-2xl">🍫</span><p class="text-[10px] mt-1 text-pink-300">150</p>
-                </div>
-                <div onclick="sendGift('Ring', 1000, '💍')" class="text-center p-2 hover:bg-white/10 rounded-xl cursor-pointer">
-                    <span class="text-2xl">💍</span><p class="text-[10px] mt-1 text-pink-300">1000</p>
-                </div>
-            </div>
-        </div>
-        <div id="gift-animation-container" class="fixed inset-0 pointer-events-none z-[200]"></div>
-    </div>
 
     <script>
-        // 1. FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBwDUe5E8qRY1dbZzUQJu9eCAKBS7YSHVU",
             authDomain: "live-e6771.firebaseapp.com",
@@ -176,161 +37,56 @@
             appId: "1:570901004231:web:220679cf41cf55b98023e2"
         };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = firebase.storage();
+        const auth = firebase.auth();
 
-        // 2. AGORA CONFIG
-        const AGORA_APP_ID = 'd369ed90f2c04b599b9e680fbe3ca788';
-        let agoraClient = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
-        let localTracks = [];
-        let currentUser = null;
-        let currentCoins = 0;
-
-        // AUTH LISTENER
-        auth.onAuthStateChanged((user) => {
+        auth.onAuthStateChanged(user => {
             if (user) {
-                setupApp(user);
-            } else {
-                document.getElementById('login-page').style.display = 'flex';
-                document.getElementById('app-content').classList.add('hidden');
+                // සබැඳිව සිටින බව සලකුණු කිරීම (Online Status)
+                db.collection('profiles').doc(user.uid).set({ online: true }, { merge: true });
+                
+                // ඇප් එකෙන් අයින් වන විට Offline කිරීම
+                window.addEventListener('beforeunload', () => {
+                    db.collection('profiles').doc(user.uid).update({ online: false });
+                });
+
+                loadUsers();
+                loadMyCoins(user.uid);
             }
         });
 
-        async function handleLogin() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const errBox = document.getElementById('login-error');
-            if(!email || !password) return errBox.innerText = "Please fill all fields.";
-            
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-            } catch (error) {
-                try {
-                    const cred = await auth.createUserWithEmailAndPassword(email, password);
-                    await db.collection('profiles').doc(cred.user.uid).set({ email, coins: 0 });
-                } catch (regError) { errBox.innerText = regError.message; }
-            }
-        }
-
-        function setupApp(user) {
-            currentUser = user;
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('app-content').classList.remove('hidden');
-            document.getElementById('user-email-display').innerText = user.email;
-            
-            db.collection('profiles').doc(user.uid).onSnapshot(doc => {
-                if(doc.exists) {
-                    currentCoins = doc.data().coins;
-                    document.getElementById('coin-balance').innerText = currentCoins;
-                    document.getElementById('profile-coins').innerText = currentCoins;
-                }
+        function loadMyCoins(uid) {
+            db.collection('profiles').doc(uid).onSnapshot(doc => {
+                if(doc.exists) document.getElementById('my-coins').innerText = doc.data().coins || 0;
             });
         }
 
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-            document.getElementById(pageId + '-page').classList.add('active-page');
-            
-            // Nav Icon Colors
-            document.querySelectorAll('nav i').forEach(icon => icon.classList.replace('text-pink-500', 'text-gray-400'));
-            const activeIcon = document.getElementById('nav-' + pageId);
-            if(activeIcon) activeIcon.classList.replace('text-gray-400', 'text-pink-500');
-        }
+        function loadUsers() {
+            db.collection('profiles').onSnapshot(snapshot => {
+                const list = document.getElementById('user-list');
+                list.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if(doc.id === auth.currentUser.uid) return; // තමන්ව ලිස්ට් එකේ පෙන්වන්නේ නැත
 
-        async function startLive() {
-            document.getElementById('live-room').classList.remove('hidden');
-            try {
-                await agoraClient.join(AGORA_APP_ID, "main_room", null, currentUser.uid);
-                localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-                localTracks[1].play('video-grid');
-                await agoraClient.publish(localTracks);
-            } catch (e) { alert("Permission Denied!"); endLive(); }
-        }
-
-        function endLive() {
-            localTracks.forEach(track => { track.stop(); track.close(); });
-            agoraClient.leave();
-            document.getElementById('live-room').classList.add('hidden');
-        }
-
-        // GIFTS SYSTEM
-        function toggleGifts() { document.getElementById('gift-box').classList.toggle('hidden'); }
-
-        async function sendGift(name, price, emoji) {
-            if (currentCoins < price) return alert("Insufficient coins!");
-            
-            await db.collection('profiles').doc(currentUser.uid).update({
-                coins: firebase.firestore.FieldValue.increment(-price)
+                    const statusClass = data.online ? 'online-dot' : 'offline-dot';
+                    
+                    list.innerHTML += `
+                        <div class="glass p-4 relative flex flex-col items-center">
+                            <div class="${statusClass}"></div>
+                            <img src="${data.profilePic || 'https://i.pravatar.cc/100'}" class="w-16 h-16 rounded-full border-2 border-pink-600 mb-2 object-cover">
+                            <p class="text-xs font-bold truncate w-full text-center">${data.name || 'User'}</p>
+                            <button onclick="followUser('${doc.id}')" class="mt-3 bg-pink-600 px-4 py-1 rounded-full text-[10px] font-bold">FOLLOW</button>
+                        </div>
+                    `;
+                });
             });
-
-            // Animation
-            const container = document.getElementById('gift-animation-container');
-            const el = document.createElement('div');
-            el.className = 'gift-animate'; el.innerHTML = emoji;
-            container.appendChild(el);
-            setTimeout(() => el.remove(), 2000);
-
-            document.getElementById('live-chat').innerHTML += `<p class="text-pink-400"><b>Me:</b> Sent ${name} ${emoji}</p>`;
-            toggleGifts();
         }
 
-        async function processDeposit() {
-            const amt = document.getElementById('dep-amount').value;
-            const file = document.getElementById('dep-slip').files[0];
-            if(!amt || !file) return alert("Fill all fields!");
-            
-            const ref = storage.ref(`slips/${Date.now()}_${currentUser.uid}.png`);
-            await ref.put(file);
-            const url = await ref.getDownloadURL();
-            await db.collection('transactions').add({
-                user_id: currentUser.uid, email: currentUser.email, amount: amt, slip_url: url, status: 'pending'
-            });
-            alert("Deposit submitted!");
+        function followUser(uid) {
+            alert("ඔබ මෙම පරිශීලකයා Follow කළා!");
+            // මෙතනට Follow logic එක පසුව ඇතුළත් කළ හැක
         }
-
-        // ADMIN ACCESS
-        let tapCount = 0, tapTimer = null;
-        function secretAdminCheck() {
-            tapCount++; clearTimeout(tapTimer);
-            tapTimer = setTimeout(() => tapCount = 0, 2000);
-            if (tapCount === 5) {
-                if(prompt("Admin Password:") === "admin123") {
-                    document.getElementById('admin-panel').classList.remove('hidden');
-                    loadAdminData();
-                }
-            }
-        }
-
-        async function loadAdminData() {
-            const snap = await db.collection('transactions').where('status','==','pending').get();
-            let html = "";
-            snap.forEach(doc => {
-                const t = doc.data();
-                html += `<div class="bg-white/5 p-4 rounded-xl border border-white/10">
-                    <p class="text-xs text-blue-400">${t.email} - LKR ${t.amount}</p>
-                    <div class="flex gap-2 mt-2">
-                        <a href="${t.slip_url}" target="_blank" class="bg-blue-600 px-3 py-1 rounded text-xs">View Slip</a>
-                        <button onclick="approveSlip('${doc.id}', ${t.amount}, '${t.user_id}')" class="bg-green-600 px-3 py-1 rounded text-xs">Approve</button>
-                    </div>
-                </div>`;
-            });
-            document.getElementById('admin-slips').innerHTML = html || "No pending slips.";
-        }
-
-        async function approveSlip(id, amt, uid) {
-            await db.collection('transactions').doc(id).update({ status: 'approved' });
-            await db.collection('profiles').doc(uid).update({ coins: firebase.firestore.FieldValue.increment(Number(amt)) });
-            alert("Approved!"); loadAdminData();
-        }
-
-        paypal.Buttons({
-            createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: '5.00' } }] }),
-            onApprove: (data, actions) => actions.order.capture().then(() => {
-                db.collection('profiles').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(500) });
-                alert("500 Coins added via PayPal!");
-            })
-        }).render('#paypal-button-container');
     </script>
 </body>
 </html>
