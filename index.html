@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YNS GALAXY PRO - Official</title>
+    <title>YNS GALAXY PRO - Professional</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -11,95 +11,208 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .active-tab { color: #ec4899; border-bottom: 2px solid #ec4899; }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
+        body { background: #050505; color: white; font-family: sans-serif; overflow-x: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .gift-btn { transition: transform 0.2s; }
+        .gift-btn:active { transform: scale(0.8); }
+        
+        /* Gift Animations */
+        @keyframes float-up { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-200px) scale(2); opacity: 0; } }
+        .animate-gift { position: fixed; bottom: 20%; left: 50%; font-size: 50px; animation: float-up 2s forwards; pointer-events: none; z-index: 100; }
+        
+        .tab-active { color: #ec4899; text-shadow: 0 0 10px #ec4899; }
+        .hidden { display: none; }
     </style>
 </head>
-<body class="bg-black text-white font-sans">
+<body>
 
-    <div class="fixed bottom-0 w-full glass z-50 flex justify-around p-4 border-t border-white/10">
-        <button onclick="switchTab('home')" id="home-btn" class="active-tab text-xl"><i class="fas fa-home"></i></button>
-        <button onclick="switchTab('live')" id="live-btn" class="text-gray-400 text-xl"><i class="fas fa-video"></i></button>
-        <button onclick="switchTab('wallet')" id="wallet-btn" class="text-gray-400 text-xl"><i class="fas fa-wallet"></i></button>
-        <button onclick="switchTab('profile')" id="profile-btn" class="text-gray-400 text-xl"><i class="fas fa-user"></i></button>
+    <div id="auth-screen" class="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center p-10">
+        <h1 class="text-4xl font-black italic text-pink-500 mb-10">YNS GALAXY</h1>
+        <input id="auth-email" type="email" placeholder="Email" class="w-full bg-zinc-900 p-4 rounded-2xl mb-4 border border-white/10">
+        <input id="auth-pass" type="password" placeholder="Password" class="w-full bg-zinc-900 p-4 rounded-2xl mb-6 border border-white/10">
+        <button onclick="handleAuth('login')" class="w-full bg-pink-600 py-4 rounded-2xl font-bold mb-4">LOGIN</button>
+        <button onclick="handleAuth('register')" class="w-full border border-pink-600 py-4 rounded-2xl font-bold text-pink-500">REGISTER</button>
     </div>
 
-    <div id="tab-home" class="p-5 pb-24">
-        <h1 class="text-pink-500 italic font-black text-2xl mb-6">YNS GALAXY PRO</h1>
-        <div class="grid grid-cols-2 gap-4">
-            <div class="bg-zinc-900 p-4 rounded-3xl text-center">
-                <img src="https://i.pravatar.cc/150?u=1" class="w-20 h-20 rounded-full mx-auto border-2 border-pink-500 mb-2">
-                <p class="font-bold text-sm">User</p>
-                <button class="bg-pink-600 px-4 py-1 rounded-full text-[10px] mt-2 font-bold uppercase">Follow</button>
+    <div id="app-screen" class="hidden">
+        
+        <header class="p-5 flex justify-between items-center fixed top-0 w-full z-40 bg-black/50">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center font-bold" id="user-initial">U</div>
+                <p class="font-bold text-sm" id="user-display-name">Loading...</p>
             </div>
-            <div class="bg-zinc-900 p-4 rounded-3xl text-center">
-                <img src="https://i.pravatar.cc/150?u=2" class="w-20 h-20 rounded-full mx-auto border-2 border-pink-500 mb-2">
-                <p class="font-bold text-sm">Nadisha</p>
-                <button class="bg-pink-600 px-4 py-1 rounded-full text-[10px] mt-2 font-bold uppercase">Follow</button>
+            <div class="glass px-4 py-1 rounded-full flex items-center gap-2">
+                <span class="text-blue-400">💎 <span id="user-coins">0</span></span>
             </div>
-        </div>
-        <h2 class="text-gray-500 text-center font-bold text-xs mt-10 tracking-widest uppercase">Recharge Coins</h2>
-    </div>
+        </header>
 
-    <div id="tab-live" class="hidden h-screen bg-zinc-950 relative">
-        <div id="local-video" class="w-full h-full bg-black"></div>
-        <div class="absolute top-5 left-5 flex items-center gap-2">
-            <div class="bg-black/50 p-1 px-3 rounded-full flex items-center gap-2">
-                <span class="text-blue-400">💎 <span id="balance">30</span></span>
+        <main class="pt-24 pb-32">
+            
+            <div id="tab-home" class="px-5">
+                <div class="bg-gradient-to-r from-pink-600 to-purple-700 p-6 rounded-[30px] mb-8 relative overflow-hidden">
+                    <h2 class="text-xl font-black">Daily Reward!</h2>
+                    <p class="text-sm opacity-80">Claim your 10 free coins today.</p>
+                    <button onclick="claimDailyBonus()" id="daily-btn" class="mt-4 bg-white text-black px-6 py-2 rounded-full font-bold text-xs">CLAIM NOW</button>
+                </div>
+                
+                <h3 class="text-zinc-500 font-bold text-xs uppercase tracking-widest mb-4">Trending Hosts</h3>
+                <div class="grid grid-cols-2 gap-4" id="hosts-list">
+                    </div>
+            </div>
+
+            <div id="tab-live" class="hidden px-5">
+                <div class="relative w-full aspect-[9/16] bg-zinc-900 rounded-[40px] overflow-hidden border border-white/10">
+                    <div id="local-video" class="w-full h-full object-cover"></div>
+                    <div class="absolute bottom-10 w-full px-8">
+                        <button onclick="startSecureLive()" id="live-action-btn" class="w-full bg-pink-600 py-4 rounded-2xl font-black shadow-xl">START LIVE STREAM</button>
+                    </div>
+                    <button onclick="toggleGifts()" class="absolute bottom-10 right-5 w-14 h-14 bg-yellow-500 rounded-full flex items-center justify-center text-xl shadow-2xl">🎁</button>
+                </div>
+            </div>
+
+            <div id="tab-wallet" class="hidden px-8">
+                <h2 class="text-2xl font-bold mb-6">Wallet & Earnings</h2>
+                <div class="glass p-8 rounded-[40px] mb-6 text-center">
+                    <p class="text-zinc-500 text-sm">Main Balance</p>
+                    <h1 class="text-5xl font-black text-blue-400 my-2">💎 <span id="wallet-balance">0</span></h1>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <button onclick="buyCoins()" class="bg-white text-black p-5 rounded-3xl font-bold"><i class="fas fa-plus-circle mr-2"></i>Buy Coins</button>
+                    <button onclick="withdrawMoney()" class="glass p-5 rounded-3xl font-bold"><i class="fas fa-university mr-2"></i>Withdraw</button>
+                </div>
+                <button onclick="firebase.auth().signOut()" class="w-full text-zinc-600 font-bold text-sm">Logout Account</button>
+            </div>
+
+        </main>
+
+        <div id="gift-panel" class="hidden fixed inset-0 bg-black/90 z-50 flex items-end">
+            <div class="w-full glass rounded-t-[50px] p-8 border-t border-white/10">
+                <div class="grid grid-cols-4 gap-4 mb-8">
+                    <div onclick="sendGift('🌹', 1)" class="gift-btn text-center p-2">🌹<p class="text-[8px] mt-1">1</p></div>
+                    <div onclick="sendGift('🎈', 5)" class="gift-btn text-center p-2">🎈<p class="text-[8px] mt-1">5</p></div>
+                    <div onclick="sendGift('🍫', 10)" class="gift-btn text-center p-2">🍫<p class="text-[8px] mt-1">10</p></div>
+                    <div onclick="sendGift('💍', 50)" class="gift-btn text-center p-2">💍<p class="text-[8px] mt-1">50</p></div>
+                    <div onclick="sendGift('👑', 100)" class="gift-btn text-center p-2">👑<p class="text-[8px] mt-1">100</p></div>
+                    <div onclick="sendGift('🚗', 500)" class="gift-btn text-center p-2">🚗<p class="text-[8px] mt-1">500</p></div>
+                    <div onclick="sendGift('🚁', 1000)" class="gift-btn text-center p-2">🚁<p class="text-[8px] mt-1">1k</p></div>
+                    <div onclick="sendGift('🏰', 2000)" class="gift-btn text-center p-2">🏰<p class="text-[8px] mt-1">2k</p></div>
+                    <div onclick="sendGift('🚀', 5000)" class="gift-btn text-center p-2">🚀<p class="text-[8px] mt-1">5k</p></div>
+                    <div onclick="sendGift('🦁', 8000)" class="gift-btn text-center p-2">🦁<p class="text-[8px] mt-1">8k</p></div>
+                    <div onclick="sendGift('🦄', 10000)" class="gift-btn text-center p-2">🦄<p class="text-[8px] mt-1">10k</p></div>
+                    <div onclick="sendGift('🌌', 50000)" class="gift-btn text-center p-2">🌌<p class="text-[8px] mt-1">50k</p></div>
+                </div>
+                <button onclick="toggleGifts()" class="w-full text-zinc-500 font-bold text-xs uppercase">Close</button>
             </div>
         </div>
-        <div class="absolute bottom-32 w-full text-center px-10">
-            <button onclick="startSecureLive()" id="go-live-btn" class="bg-pink-600 w-full py-4 rounded-2xl font-black shadow-lg shadow-pink-500/20">GO LIVE NOW</button>
-        </div>
-        <button onclick="showGifts()" class="absolute bottom-32 right-5 w-14 h-14 bg-gradient-to-tr from-pink-500 to-yellow-500 rounded-full flex items-center justify-center shadow-xl"><i class="fas fa-gift text-xl"></i></button>
-    </div>
 
-    <div id="gift-panel" class="hidden fixed inset-0 bg-black/80 z-[60] flex items-end">
-        <div class="w-full bg-zinc-900 rounded-t-[40px] p-8 grid grid-cols-3 gap-6">
-            <div onclick="sendGift('🌹', 10)" class="text-center bg-white/5 p-4 rounded-3xl">🌹<p class="text-xs font-bold mt-1 text-gray-400">10</p></div>
-            <div onclick="sendGift('💎', 50)" class="text-center bg-white/5 p-4 rounded-3xl">💎<p class="text-xs font-bold mt-1 text-gray-400">50</p></div>
-            <div onclick="sendGift('🦁', 500)" class="text-center bg-white/5 p-4 rounded-3xl">🦁<p class="text-xs font-bold mt-1 text-gray-400">500</p></div>
-            <button onclick="showGifts()" class="col-span-3 text-gray-500 text-xs font-bold">CLOSE</button>
-        </div>
+        <nav class="fixed bottom-0 w-full glass h-24 flex justify-around items-center px-10 rounded-t-[40px] z-40">
+            <button onclick="switchTab('home')" id="nav-home" class="tab-active text-xl"><i class="fas fa-th-large"></i></button>
+            <button onclick="switchTab('live')" id="nav-live" class="text-zinc-600 text-xl"><i class="fas fa-video"></i></button>
+            <button onclick="switchTab('wallet')" id="nav-wallet" class="text-zinc-600 text-xl"><i class="fas fa-wallet"></i></button>
+        </nav>
     </div>
 
     <script>
-        // CONFIG - Verify this App ID with your Agora Console
-        const AGORA_APP_ID = "d369ed90f2c04b599b9e680fbe3ca788"; 
-        
+        // CONFIG
+        const firebaseConfig = { apiKey: "AIzaSyBwDUe5E8qRY1dbZzUQJu9eCAKBS7YSHVU", authDomain: "live-e6771.firebaseapp.com", projectId: "live-e6771", storageBucket: "live-e6771.firebasestorage.app", messagingSenderId: "570901004231", appId: "1:570901004231:web:220679cf41cf55b98023e2" };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
         const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
-        let localTracks = [];
+        let currentUser = null, localTracks = [];
 
-        function switchTab(tab) {
-            document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
-            document.getElementById('tab-' + tab).classList.remove('hidden');
-            document.querySelectorAll('button[id$="-btn"]').forEach(el => el.classList.remove('active-tab'));
-            document.getElementById(tab + '-btn').classList.add('active-tab');
+        // AUTH LOGIC
+        async function handleAuth(type) {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-pass').value;
+            try {
+                if(type === 'register') {
+                    const res = await auth.createUserWithEmailAndPassword(email, pass);
+                    await db.collection('profiles').doc(res.user.uid).set({ coins: 10, lastLogin: Date.now() });
+                } else {
+                    await auth.signInWithEmailAndPassword(email, pass);
+                }
+            } catch (err) { alert(err.message); }
         }
 
-        async function startSecureLive() {
-            const uid = Math.floor(Math.random() * 100000);
-            try {
-                // Backend එකෙන් ආරක්ෂිත Token එක ඉල්ලනවා
-                const res = await fetch(`/api/generate-token?channelName=main_room&uid=${uid}`);
-                const data = await res.json();
+        auth.onAuthStateChanged(user => {
+            if(user) {
+                currentUser = user;
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+                syncUserData();
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('hidden');
+            }
+        });
 
-                if (!data.token) throw new Error("Key/Certificate missing in Vercel!");
+        async function syncUserData() {
+            db.collection('profiles').doc(currentUser.uid).onSnapshot(doc => {
+                const data = doc.data();
+                document.getElementById('user-coins').innerText = data.coins;
+                document.getElementById('wallet-balance').innerText = data.coins;
+                document.getElementById('user-display-name').innerText = currentUser.email.split('@')[0];
+            });
+        }
 
-                await client.join(AGORA_APP_ID, "main_room", data.token, uid);
-                localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-                localTracks[1].play('local-video');
-                await client.publish(localTracks);
-
-                document.getElementById('go-live-btn').classList.add('hidden');
-                alert("You are now LIVE and SECURE!");
-            } catch (err) {
-                alert("CAMERA ERROR: " + err.message + "\n\n1. Vercel එකට ගිහින් AGORA_APP_CERT variable එක දාලා Redeploy කරන්න.\n2. Browser Permission Allow කරන්න.");
+        // DAILY BONUS
+        async function claimDailyBonus() {
+            const ref = db.collection('profiles').doc(currentUser.uid);
+            const doc = await ref.get();
+            const lastLogin = doc.data().lastLogin || 0;
+            const now = Date.now();
+            
+            if (now - lastLogin > 86400000) {
+                await ref.update({ coins: firebase.firestore.FieldValue.increment(10), lastLogin: now });
+                alert("🎁 10 Daily Coins Added!");
+            } else {
+                alert("Wait until tomorrow for more coins!");
             }
         }
 
-        function showGifts() { document.getElementById('gift-panel').classList.toggle('hidden'); }
-        function sendGift(e, p) { alert(`Sending ${e}...`); showGifts(); }
+        // TAB SWITCHER
+        function switchTab(tab) {
+            document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
+            document.getElementById('tab-'+tab).classList.remove('hidden');
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active'));
+            document.getElementById('nav-'+tab).classList.add('tab-active');
+        }
+
+        function toggleGifts() { document.getElementById('gift-panel').classList.toggle('hidden'); }
+
+        // GIFT ANIMATION
+        function sendGift(emoji, cost) {
+            const coinRef = db.collection('profiles').doc(currentUser.uid);
+            coinRef.get().then(doc => {
+                if(doc.data().coins >= cost) {
+                    coinRef.update({ coins: firebase.firestore.FieldValue.increment(-cost) });
+                    const ani = document.createElement('div');
+                    ani.className = 'animate-gift';
+                    ani.innerText = emoji;
+                    document.body.appendChild(ani);
+                    setTimeout(() => ani.remove(), 2000);
+                    toggleGifts();
+                } else { alert("Insufficient Coins!"); }
+            });
+        }
+
+        // SECURE LIVE
+        async function startSecureLive() {
+            try {
+                const res = await fetch(`/api/generate-token?channelName=main&uid=0`);
+                const { token } = await res.json();
+                await client.join("d369ed90f2c04b599b9e680fbe3ca788", "main", token, 0);
+                localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
+                localTracks[1].play('local-video');
+                await client.publish(localTracks);
+                document.getElementById('live-action-btn').innerText = "STOP LIVE";
+                document.getElementById('live-action-btn').onclick = () => location.reload();
+            } catch (err) { alert("Camera Error: Check Vercel Key Settings."); }
+        }
+
+        function buyCoins() { alert("Redirecting to PayPal/Payment Gateway..."); }
+        function withdrawMoney() { alert("Withdrawal: Minimum $10 (1000 Coins) required."); }
     </script>
 </body>
 </html>
