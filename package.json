@@ -1,0 +1,8 @@
+{
+  "name": "yns-live-backend",
+  "version": "1.0.0",
+  "dependencies": {
+    "agora-access-token": "^2.0.4",
+    "cors": "^2.8.5"
+  }
+}
