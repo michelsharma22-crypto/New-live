@@ -3,282 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>YNS GALAXY - PRO MAX</title>
+    <title>YNS LIVE - Premium Galaxy v3</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-    
+    <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.18.2.js"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=ATfsClCXiMMz7YyApME13i3yJkQK4UPDTL3PwPNh10Et5d17z9cpk-6_q0MqvCrVya9T5kwcc-OCY&currency=USD"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
     <style>
-        body { background: #000; color: white; font-family: sans-serif; overflow-x: hidden; }
-        .glass { background: rgba(20, 20, 20, 0.9); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .page { display: none; padding: 80px 20px 100px 20px; min-height: 100vh; }
+        :root { --pink: #ff0077; --dark-glass: rgba(0, 0, 0, 0.85); }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: #000; color: white; overflow: hidden; }
+        .page { display: none; height: 100vh; width: 100vw; position: absolute; top: 0; left: 0; overflow-y: auto; padding-top: 70px; padding-bottom: 90px; }
         .active-page { display: block; }
-        .online-dot { width: 12px; height: 12px; background: #22c55e; border-radius: 50%; position: absolute; top: 10px; right: 10px; box-shadow: 0 0 8px #22c55e; }
-        .offline-dot { width: 12px; height: 12px; background: #6b7280; border-radius: 50%; position: absolute; top: 10px; right: 10px; }
-        .gift-anim { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; font-size: 80px; animation: giftPop 1.5s ease-out forwards; pointer-events: none; }
-        @keyframes giftPop { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -80%) scale(1.5); } 100% { opacity: 0; transform: translate(-50%, -120%) scale(1); } }
+        .glass { background: var(--dark-glass); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; }
+        
+        /* Full Screen Live UI */
+        #live-room { display: none; position: fixed; inset: 0; z-index: 100; background: #000; }
+        #video-grid { width: 100%; height: 100%; object-fit: cover; }
+        .live-overlay { position: absolute; inset: 0; z-index: 110; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; pointer-events: none; }
+        .interactive { pointer-events: auto; }
+        
+        /* Gift Animation */
+        .gift-animate { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; z-index: 200; animation: gift-pop 2s ease-out forwards; pointer-events: none; }
+        @keyframes gift-pop { 0% { scale: 0; opacity: 0; } 50% { scale: 1.5; opacity: 1; } 100% { scale: 1; opacity: 0; transform: translate(-50%, -150%); } }
+        
+        /* Bottom Panel */
+        .gift-panel { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); border-radius: 30px 30px 0 0; padding: 25px; display: none; z-index: 150; grid-template-columns: repeat(4, 1fr); gap: 15px; border-top: 2px solid var(--pink); }
     </style>
 </head>
 <body>
-    <div id="gift-container"></div>
 
-    <header class="fixed top-0 w-full z-50 p-4 flex justify-between items-center bg-black/80 backdrop-blur-md border-b border-white/10">
-        <h1 class="text-pink-600 font-black italic text-xl">YNS GALAXY</h1>
-        <div class="bg-white/10 px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2">
-            💎 <span id="nav-coins">0</span>
+    <header id="main-header" class="fixed top-0 w-full z-40 p-4 flex justify-between items-center bg-black/80 border-b border-white/10">
+        <span class="text-xl font-black text-pink-600 italic">YNS GALAXY</span>
+        <div class="flex items-center gap-3">
+            <div class="bg-white/10 px-3 py-1 rounded-full border border-pink-500/30 flex items-center gap-2">
+                <i class="fas fa-gem text-blue-400 text-xs"></i><span id="nav-coins" class="font-bold text-sm">0</span>
+            </div>
         </div>
     </header>
 
-    <div id="page-home" class="page active-page">
-        <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Discovery Feed</h2>
-        <div id="user-list" class="grid grid-cols-2 gap-4"></div>
+    <div id="page-home" class="page active-page px-4">
+        <div class="grid grid-cols-2 gap-4 mt-4" id="discovery-list">
+            </div>
     </div>
 
-    <div id="page-live" class="page">
-        <div class="glass p-6 text-center">
-            <h2 class="font-bold mb-4 text-pink-500">Live & Gifts Simulation</h2>
-            <div class="w-full h-48 bg-zinc-900 rounded-xl mb-4 flex items-center justify-center border border-white/10">
-                <p class="text-gray-500"><i class="fas fa-video text-2xl mb-2"></i><br>Live Stream Area</p>
-            </div>
-            <h3 class="font-bold text-sm mb-3">Send Gifts</h3>
-            <div class="grid grid-cols-3 gap-2">
-                <button onclick="sendGift('🌹', 10)" class="bg-white/5 p-3 rounded-xl border border-white/10 active:border-pink-500">🌹<br><span class="text-[10px] text-gray-400">10 Coins</span></button>
-                <button onclick="sendGift('💎', 50)" class="bg-white/5 p-3 rounded-xl border border-white/10 active:border-pink-500">💎<br><span class="text-[10px] text-gray-400">50 Coins</span></button>
-                <button onclick="sendGift('🦁', 500)" class="bg-white/5 p-3 rounded-xl border border-white/10 active:border-pink-500">🦁<br><span class="text-[10px] text-gray-400">500 Coins</span></button>
-            </div>
-        </div>
-    </div>
-
-    <div id="page-wallet" class="page">
-        <div class="glass p-6 mb-6">
-            <h3 class="text-center font-bold mb-4">Recharge Coins ($5.00)</h3>
+    <div id="page-wallet" class="page px-6">
+        <div class="glass p-6 text-center mb-6 mt-4">
+            <h3 class="text-pink-500 font-bold mb-4">RECHARGE COINS</h3>
             <div id="paypal-button-container"></div>
         </div>
         <div class="glass p-6 text-center">
-            <h3 class="font-bold mb-4 text-green-400">Withdraw Coins</h3>
-            <input type="number" id="withdraw-amount" placeholder="Enter Coin Amount" class="w-full bg-black border border-white/20 p-3 rounded-xl mb-3 outline-none text-center">
-            <input type="text" id="withdraw-method" placeholder="Bank / Binance Pay ID" class="w-full bg-black border border-white/20 p-3 rounded-xl mb-4 outline-none text-center text-sm">
-            <button onclick="requestWithdraw()" class="bg-green-600 w-full py-3 rounded-xl font-bold">Request Withdrawal</button>
+            <h3 class="text-green-500 font-bold mb-4">WITHDRAW CASH</h3>
+            <input id="w-amount" type="number" placeholder="Coin Amount" class="w-full bg-black border border-white/10 p-4 rounded-xl mb-3 outline-none">
+            <input id="w-method" type="text" placeholder="Bank / Binance ID" class="w-full bg-black border border-white/10 p-4 rounded-xl mb-4 outline-none">
+            <button onclick="handleWithdraw()" class="w-full bg-green-600 py-4 rounded-xl font-bold uppercase tracking-widest">Request Withdrawal</button>
         </div>
     </div>
 
-    <div id="page-profile" class="page">
+    <div id="page-profile" class="page px-6">
         <div class="glass p-6 text-center">
-            <div class="relative inline-block mb-4">
-                <img id="profile-img" src="https://i.pravatar.cc/150" class="w-28 h-28 rounded-full border-4 border-pink-600 object-cover">
-                <input type="file" id="upload-photo" class="hidden" onchange="uploadPhoto(this)" accept="image/*">
-                <label for="upload-photo" class="absolute bottom-0 right-0 bg-pink-600 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border-2 border-black"><i class="fas fa-camera text-xs"></i></label>
+            <div class="relative w-24 h-24 mx-auto mb-6">
+                <img id="profile-display" src="https://i.pravatar.cc/150" class="w-full h-full rounded-full border-4 border-pink-600 object-cover">
+                <label class="absolute bottom-0 right-0 bg-pink-600 p-2 rounded-full cursor-pointer"><i class="fas fa-camera text-xs"></i><input type="file" onchange="previewImg(this)" class="hidden"></label>
             </div>
-            <input id="user-name" type="text" placeholder="ඔබේ නම" class="bg-transparent text-center w-full font-bold outline-none text-2xl mb-2 border-b border-white/10 pb-2">
-            <input id="user-bio" type="text" placeholder="Bio එකක් ලියන්න" class="bg-transparent text-center w-full text-gray-400 outline-none text-sm italic border-b border-white/10 pb-2">
-            <button onclick="saveProfile()" class="mt-6 bg-pink-600 px-8 py-3 rounded-full text-sm font-bold w-full">SAVE PROFILE</button>
-            <button onclick="auth.signOut()" class="mt-4 text-red-500 text-xs font-bold w-full">LOGOUT</button>
+            <div class="space-y-4 text-left">
+                <input id="u-name" type="text" placeholder="Name" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none">
+                <textarea id="u-bio" placeholder="Bio" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none h-20"></textarea>
+                <button id="save-btn" onclick="saveProfile()" class="w-full bg-pink-600 p-4 rounded-xl font-bold uppercase">Update Profile</button>
+                <button onclick="auth.signOut()" class="w-full text-red-500 font-bold text-xs mt-4">LOGOUT</button>
+            </div>
         </div>
     </div>
 
-    <nav class="fixed bottom-0 w-full bg-black/90 border-t border-white/10 flex justify-around items-center py-4 z-50 backdrop-blur-lg">
-        <button onclick="switchPage('home')" class="text-gray-500 hover:text-pink-600 focus:text-pink-600"><i class="fas fa-home text-xl"></i></button>
-        <button onclick="switchPage('live')" class="text-gray-500 hover:text-pink-600 focus:text-pink-600"><i class="fas fa-video text-xl"></i></button>
-        <button onclick="switchPage('wallet')" class="text-gray-500 hover:text-pink-600 focus:text-pink-600"><i class="fas fa-wallet text-xl"></i></button>
-        <button onclick="switchPage('profile')" class="text-gray-500 hover:text-pink-600 focus:text-pink-600"><i class="fas fa-user-circle text-xl"></i></button>
+    <div id="live-room">
+        <div id="video-grid"></div>
+        <div class="live-overlay">
+            <div class="flex justify-between interactive">
+                <div class="bg-black/40 p-1 pr-4 rounded-full flex items-center gap-2">
+                    <img id="host-mini-img" src="https://i.pravatar.cc/50" class="w-8 h-8 rounded-full border border-pink-500">
+                    <span class="text-[10px] font-bold">LIVE STREAM</span>
+                </div>
+                <button onclick="endLive()" class="bg-red-600 px-4 py-1 rounded-full text-xs font-bold">EXIT</button>
+            </div>
+            <div class="flex justify-between items-end mb-10 interactive">
+                <div class="flex gap-3">
+                    <button onclick="toggleAudio()" class="w-12 h-12 rounded-full bg-black/50 border border-white/20 flex items-center justify-center"><i id="mic-icon" class="fas fa-microphone"></i></button>
+                    <button onclick="switchCamera()" class="w-12 h-12 rounded-full bg-black/50 border border-white/20 flex items-center justify-center"><i class="fas fa-sync"></i></button>
+                </div>
+                <button onclick="toggleGifts()" class="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-500 to-yellow-500 flex items-center justify-center border-2 border-white shadow-xl"><i class="fas fa-gift text-2xl"></i></button>
+            </div>
+        </div>
+        <div id="gift-box" class="gift-panel interactive">
+            <div onclick="sendGift('🌹', 10)" class="text-center">🌹<p class="text-[8px]">10</p></div>
+            <div onclick="sendGift('💋', 50)" class="text-center">💋<p class="text-[8px]">50</p></div>
+            <div onclick="sendGift('❤️', 20)" class="text-center">❤️<p class="text-[8px]">20</p></div>
+            <div onclick="sendGift('🏩', 1000)" class="text-center">🏩<p class="text-[8px]">1k</p></div>
+            <div onclick="sendGift('🫦', 30)" class="text-center">🫦<p class="text-[8px]">30</p></div>
+            <div onclick="sendGift('🚿', 200)" class="text-center">🚿<p class="text-[8px]">200</p></div>
+            <div onclick="sendGift('🛏️', 500)" class="text-center">🛏️<p class="text-[8px]">500</p></div>
+            <div onclick="sendGift('👙', 800)" class="text-center">👙<p class="text-[8px]">800</p></div>
+            <div onclick="sendGift('🧴', 40)" class="text-center">🧴<p class="text-[8px]">40</p></div>
+            <div onclick="sendGift('👣', 150)" class="text-center">👣<p class="text-[8px]">150</p></div>
+            <div onclick="sendGift('🥂', 300)" class="text-center">🥂<p class="text-[8px]">300</p></div>
+            <div onclick="sendGift('🚀', 5000)" class="text-center">🚀<p class="text-[8px]">5k</p></div>
+        </div>
+        <div id="gift-anim-layer" class="fixed inset-0 pointer-events-none z-[200]"></div>
+    </div>
+
+    <nav id="footer-nav" class="fixed bottom-0 w-full bg-black/90 border-t border-white/10 flex justify-around items-center py-5 z-40">
+        <i onclick="showPage('home')" class="fas fa-home text-xl text-pink-600 cursor-pointer"></i>
+        <i onclick="startLive()" class="fas fa-video text-2xl text-white bg-pink-600 p-3 rounded-full shadow-lg cursor-pointer"></i>
+        <i onclick="showPage('wallet')" class="fas fa-wallet text-xl text-gray-500 cursor-pointer"></i>
+        <i onclick="showPage('profile')" class="fas fa-user-circle text-xl text-gray-500 cursor-pointer"></i>
     </nav>
 
     <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBwDUe5E8qRY1dbZzUQJu9eCAKBS7YSHVU",
-            authDomain: "live-e6771.firebaseapp.com",
-            projectId: "live-e6771",
-            storageBucket: "live-e6771.firebasestorage.app",
-            messagingSenderId: "570901004231",
-            appId: "1:570901004231:web:220679cf41cf55b98023e2"
-        };
+        // INIT
+        const firebaseConfig = { apiKey: "AIzaSyBwDUe5E8qRY1dbZzUQJu9eCAKBS7YSHVU", authDomain: "live-e6771.firebaseapp.com", projectId: "live-e6771", storageBucket: "live-e6771.firebasestorage.app", messagingSenderId: "570901004231", appId: "1:570901004231:web:220679cf41cf55b98023e2" };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
         const auth = firebase.auth();
-        const storage = firebase.storage();
+        const db = firebase.firestore();
+        
+        let currentUser = null, currentCoins = 0, selectedFile = null, localTracks = [];
+        let agoraClient = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 
-        let currentUserDoc = null;
-
-        // Auth State & Core Logic
-        auth.onAuthStateChanged(async user => {
+        auth.onAuthStateChanged(user => {
             if (user) {
-                // Online Status Handle
-                const userRef = db.collection('profiles').doc(user.uid);
-                userRef.set({ online: true }, { merge: true });
-                window.onbeforeunload = () => userRef.update({ online: false });
-
-                // Check Daily Login Reward
-                const today = new Date().toDateString();
-                const docSnap = await userRef.get();
-                if(docSnap.exists) {
-                    const data = docSnap.data();
-                    if(data.lastLogin !== today) {
-                        userRef.update({
-                            coins: firebase.firestore.FieldValue.increment(50),
-                            lastLogin: today
-                        });
-                        alert("🎉 Daily Login Reward: 50 Coins Added!");
-                    }
-                } else {
-                    userRef.set({ coins: 0, lastLogin: today, name: 'New User' }, { merge: true });
-                }
-
-                // Load My Data (Coins, Profile)
-                userRef.onSnapshot(doc => {
-                    if(doc.exists) {
-                        const d = doc.data();
-                        currentUserDoc = d;
-                        document.getElementById('nav-coins').innerText = d.coins || 0;
-                        document.getElementById('user-name').value = d.name || "";
-                        document.getElementById('user-bio').value = d.bio || "";
-                        if(d.profilePic) document.getElementById('profile-img').src = d.profilePic;
-                    }
-                });
-
-                loadUsers();
-                renderPayPalBackend();
+                currentUser = user;
+                syncData();
+                renderPayPal();
+                loadDiscovery();
             }
         });
 
-        // Load Home Feed Users
-        function loadUsers() {
-            db.collection('profiles').onSnapshot(snap => {
-                const list = document.getElementById('user-list');
-                list.innerHTML = '';
-                snap.forEach(doc => {
-                    if(!auth.currentUser || doc.id === auth.currentUser.uid) return;
+        function syncData() {
+            db.collection('profiles').doc(currentUser.uid).onSnapshot(doc => {
+                if(doc.exists) {
                     const d = doc.data();
-                    list.innerHTML += `
-                        <div class="glass p-4 relative flex flex-col items-center text-center">
-                            <div class="${d.online ? 'online-dot' : 'offline-dot'}"></div>
-                            <img src="${d.profilePic || 'https://i.pravatar.cc/100'}" class="w-16 h-16 rounded-full border-2 border-pink-600 mb-2 object-cover">
-                            <p class="text-xs font-bold truncate w-full">${d.name || 'User'}</p>
-                            <p class="text-[10px] text-gray-500 mb-3 truncate w-full">${d.bio || 'No bio'}</p>
-                            <button class="bg-pink-600 px-4 py-1.5 rounded-full text-[10px] font-black w-full">FOLLOW</button>
-                        </div>`;
-                });
-            });
-        }
-
-        // Profile Functions
-        async function saveProfile() {
-            if(!auth.currentUser) return;
-            await db.collection('profiles').doc(auth.currentUser.uid).update({
-                name: document.getElementById('user-name').value,
-                bio: document.getElementById('user-bio').value
-            });
-            alert("Profile Updated Successfully!");
-        }
-
-        function uploadPhoto(input) {
-            const file = input.files[0];
-            if(!file || !auth.currentUser) return;
-            
-            document.getElementById('profile-img').style.opacity = '0.5'; // Uploading visual
-            const ref = storage.ref('profiles/' + auth.currentUser.uid);
-            
-            ref.put(file).then(() => {
-                ref.getDownloadURL().then(url => {
-                    db.collection('profiles').doc(auth.currentUser.uid).update({ profilePic: url });
-                    document.getElementById('profile-img').src = url;
-                    document.getElementById('profile-img').style.opacity = '1';
-                });
-            }).catch(err => alert("Upload failed: " + err.message));
-        }
-
-        // Gifts System
-        function sendGift(emoji, cost) {
-            if(!currentUserDoc || currentUserDoc.coins < cost) {
-                alert("Not enough coins!"); return;
-            }
-            
-            // Animation
-            const el = document.createElement('div');
-            el.className = 'gift-anim';
-            el.innerText = emoji;
-            document.getElementById('gift-container').appendChild(el);
-            setTimeout(() => el.remove(), 1500);
-
-            // Deduct Coins
-            db.collection('profiles').doc(auth.currentUser.uid).update({
-                coins: firebase.firestore.FieldValue.increment(-cost)
-            });
-        }
-
-        // Withdraw Request
-        async function requestWithdraw() {
-            const amount = parseInt(document.getElementById('withdraw-amount').value);
-            const method = document.getElementById('withdraw-method').value;
-
-            if(!amount || amount <= 0 || !method) {
-                alert("Please enter valid amount and withdrawal method."); return;
-            }
-            if(!currentUserDoc || currentUserDoc.coins < amount) {
-                alert("Insufficient Coins for withdrawal!"); return;
-            }
-
-            // Deduct coins & create request
-            await db.collection('profiles').doc(auth.currentUser.uid).update({
-                coins: firebase.firestore.FieldValue.increment(-amount)
-            });
-            await db.collection('withdraw_requests').add({
-                userId: auth.currentUser.uid,
-                name: currentUserDoc.name,
-                amount: amount,
-                method: method,
-                status: 'pending',
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
-            alert(`Withdrawal request for ${amount} coins submitted successfully!`);
-            document.getElementById('withdraw-amount').value = '';
-            document.getElementById('withdraw-method').value = '';
-        }
-
-        // Backend PayPal System
-        function renderPayPalBackend() {
-            const container = document.getElementById('paypal-button-container');
-            if(container.innerHTML !== '') return; // Prevent duplicate rendering
-
-            paypal.Buttons({
-                createOrder: async function() {
-                    const res = await fetch('/api/create-order', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ amount: "5.00" })
-                    });
-                    const order = await res.json();
-                    return order.id;
-                },
-                onApprove: async function(data) {
-                    const res = await fetch('/api/capture-order', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            orderID: data.orderID,
-                            userId: auth.currentUser.uid 
-                        })
-                    });
-                    const result = await res.json();
-                    if(result.status === "COMPLETED" || result.success) {
-                        alert('Payment Success! Coins updated via Backend.');
+                    currentCoins = d.coins || 0;
+                    document.getElementById('nav-coins').innerText = currentCoins;
+                    document.getElementById('u-name').value = d.name || '';
+                    document.getElementById('u-bio').value = d.bio || '';
+                    if(d.profilePic) {
+                        document.getElementById('profile-display').src = d.profilePic;
+                        document.getElementById('host-mini-img').src = d.profilePic;
+                    }
+                    // Daily Bonus Logic
+                    const today = new Date().toDateString();
+                    if(d.lastLogin !== today) {
+                        db.collection('profiles').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(20), lastLogin: today });
+                        alert("Daily Bonus: +20 Coins! 🎁");
                     }
                 }
+            });
+        }
+
+        // Live & Agora
+        async function startLive() {
+            document.getElementById('live-room').style.display = 'block';
+            try {
+                await agoraClient.join('d369ed90f2c04b599b9e680fbe3ca788', "main_room", null, currentUser.uid);
+                localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
+                localTracks[1].play('video-grid');
+                await agoraClient.publish(localTracks);
+            } catch (e) { alert("Camera Error!"); endLive(); }
+        }
+
+        function endLive() {
+            localTracks.forEach(t => { t.stop(); t.close(); });
+            agoraClient.leave();
+            document.getElementById('live-room').style.display = 'none';
+        }
+
+        function toggleAudio() {
+            const muted = localTracks[0].muted;
+            localTracks[0].setMuted(!muted);
+            document.getElementById('mic-icon').className = !muted ? 'fas fa-microphone-slash text-red-500' : 'fas fa-microphone';
+        }
+
+        // Gifts
+        function toggleGifts() { 
+            const box = document.getElementById('gift-box');
+            box.style.display = box.style.display === 'grid' ? 'none' : 'grid';
+        }
+
+        async function sendGift(emoji, price) {
+            if (currentCoins < price) return alert("Insufficient Coins!");
+            await db.collection('profiles').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(-price) });
+            const anim = document.createElement('div');
+            anim.className = 'gift-animate'; anim.innerHTML = emoji;
+            document.getElementById('gift-anim-layer').appendChild(anim);
+            setTimeout(() => anim.remove(), 2000);
+            toggleGifts();
+        }
+
+        // Profile Update
+        function previewImg(input) {
+            if (input.files[0]) {
+                selectedFile = input.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => document.getElementById('profile-display').src = e.target.result;
+                reader.readAsDataURL(selectedFile);
+            }
+        }
+
+        async function saveProfile() {
+            const btn = document.getElementById('save-btn');
+            btn.innerText = "UPDATING..."; btn.disabled = true;
+            let url = document.getElementById('profile-display').src;
+            if (selectedFile) {
+                const fd = new FormData();
+                fd.append('file', selectedFile);
+                fd.append('upload_preset', 'my_profile_preset');
+                const res = await fetch('https://api.cloudinary.com/v1_1/dbhf9fb13/image/upload', { method: 'POST', body: fd });
+                const data = await res.json();
+                url = data.secure_url;
+            }
+            await db.collection('profiles').doc(currentUser.uid).set({ name: document.getElementById('u-name').value, bio: document.getElementById('u-bio').value, profilePic: url }, { merge: true });
+            alert("Success!"); btn.innerText = "UPDATE PROFILE"; btn.disabled = false;
+        }
+
+        // Withdraw
+        async function handleWithdraw() {
+            const amt = parseInt(document.getElementById('w-amount').value);
+            const meth = document.getElementById('w-method').value;
+            if(!amt || amt > currentCoins) return alert("Check your balance!");
+            await db.collection('profiles').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(-amt) });
+            await db.collection('withdrawals').add({ uid: currentUser.uid, amount: amt, method: meth, status: 'pending' });
+            alert("Withdrawal Requested!");
+        }
+
+        function renderPayPal() {
+            paypal.Buttons({
+                createOrder: (d, a) => a.order.create({ purchase_units: [{ amount: { value: '10.00' } }] }),
+                onApprove: (d, a) => a.order.capture().then(() => {
+                    db.collection('profiles').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(1000) });
+                    alert("1000 Coins Added!");
+                })
             }).render('#paypal-button-container');
         }
 
-        // Navigation Switcher
-        function switchPage(pageId) {
+        function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-            document.getElementById('page-' + pageId).classList.add('active-page');
-            window.scrollTo(0, 0);
+            document.getElementById('page-' + id).classList.add('active-page');
+        }
+
+        function loadDiscovery() {
+            const list = document.getElementById('discovery-list');
+            for(let i=1; i<=4; i++) {
+                list.innerHTML += `<div class="glass p-4 text-center"><img src="https://i.pravatar.cc/100?u=${i}" class="w-16 h-16 rounded-full mx-auto mb-2 border-2 border-pink-500"><p class="text-[10px] font-bold">User ${i}</p><button onclick="startLive()" class="mt-2 bg-pink-600 text-[8px] px-3 py-1 rounded-full">Watch Live</button></div>`;
+            }
         }
     </script>
 </body>
