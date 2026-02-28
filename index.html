@@ -3,29 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YNS GALAXY - LIVE STATUS</title>
+    <title>YNS GALAXY - FINAL FIX</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=ATfsClCXiMMz7YyApME13i3yJkQK4UPDTL3PwPNh10Et5d17z9cpk-6_q0MqvCrVya9T5kwcc-OCY&currency=USD"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #000; color: white; font-family: sans-serif; }
+        body { background: #000; color: white; }
         .glass { background: rgba(30, 30, 30, 0.9); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .online-dot { width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid #000; position: absolute; top: 5px; right: 5px; box-shadow: 0 0 8px #22c55e; }
-        .offline-dot { width: 12px; height: 12px; background: #6b7280; border-radius: 50%; border: 2px solid #000; position: absolute; top: 5px; right: 5px; }
+        .online-dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; display: inline-block; margin-right: 5px; box-shadow: 0 0 8px #22c55e; }
     </style>
 </head>
-<body class="p-4 pb-24">
-
-    <header class="flex justify-between items-center mb-6">
-        <h1 class="text-pink-600 font-black italic text-xl">YNS GALAXY</h1>
-        <div class="bg-white/10 px-3 py-1 rounded-full text-xs">💎 <span id="my-coins">0</span></div>
-    </header>
-
-    <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Online Users</h2>
-    
-    <div id="user-list" class="grid grid-cols-2 gap-4">
-        </div>
+<body class="p-6">
+    <h1 class="text-pink-600 font-black italic text-2xl mb-6">YNS GALAXY PRO</h1>
+    <div id="user-list" class="grid grid-cols-2 gap-4"></div>
+    <div class="mt-8 border-t border-white/10 pt-6">
+        <h3 class="text-center text-sm mb-4 text-gray-400 font-bold">RECHARGE COINS</h3>
+        <div id="paypal-button-container"></div>
+    </div>
 
     <script>
         const firebaseConfig = {
@@ -42,50 +38,37 @@
 
         auth.onAuthStateChanged(user => {
             if (user) {
-                // සබැඳිව සිටින බව සලකුණු කිරීම (Online Status)
                 db.collection('profiles').doc(user.uid).set({ online: true }, { merge: true });
-                
-                // ඇප් එකෙන් අයින් වන විට Offline කිරීම
-                window.addEventListener('beforeunload', () => {
-                    db.collection('profiles').doc(user.uid).update({ online: false });
-                });
-
+                window.onbeforeunload = () => db.collection('profiles').doc(user.uid).update({ online: false });
                 loadUsers();
-                loadMyCoins(user.uid);
+                renderPayPal();
             }
         });
 
-        function loadMyCoins(uid) {
-            db.collection('profiles').doc(uid).onSnapshot(doc => {
-                if(doc.exists) document.getElementById('my-coins').innerText = doc.data().coins || 0;
-            });
-        }
-
         function loadUsers() {
-            db.collection('profiles').onSnapshot(snapshot => {
+            db.collection('profiles').onSnapshot(snap => {
                 const list = document.getElementById('user-list');
                 list.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if(doc.id === auth.currentUser.uid) return; // තමන්ව ලිස්ට් එකේ පෙන්වන්නේ නැත
-
-                    const statusClass = data.online ? 'online-dot' : 'offline-dot';
-                    
+                snap.forEach(doc => {
+                    if(doc.id === auth.currentUser.uid) return;
+                    const d = doc.data();
                     list.innerHTML += `
                         <div class="glass p-4 relative flex flex-col items-center">
-                            <div class="${statusClass}"></div>
-                            <img src="${data.profilePic || 'https://i.pravatar.cc/100'}" class="w-16 h-16 rounded-full border-2 border-pink-600 mb-2 object-cover">
-                            <p class="text-xs font-bold truncate w-full text-center">${data.name || 'User'}</p>
-                            <button onclick="followUser('${doc.id}')" class="mt-3 bg-pink-600 px-4 py-1 rounded-full text-[10px] font-bold">FOLLOW</button>
-                        </div>
-                    `;
+                            <span class="${d.online ? 'online-dot' : ''}"></span>
+                            <img src="${d.profilePic || 'https://i.pravatar.cc/100'}" class="w-16 h-16 rounded-full border-2 border-pink-600 mb-2">
+                            <p class="text-xs font-bold">${d.name || 'User'}</p>
+                            <button onclick="alert('Followed!')" class="mt-3 bg-pink-600 px-4 py-1 rounded-full text-[10px] font-bold">FOLLOW</button>
+                        </div>`;
                 });
             });
         }
 
-        function followUser(uid) {
-            alert("ඔබ මෙම පරිශීලකයා Follow කළා!");
-            // මෙතනට Follow logic එක පසුව ඇතුළත් කළ හැක
+        function renderPayPal() {
+            document.getElementById('paypal-button-container').innerHTML = '';
+            paypal.Buttons({
+                createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: '5.00' } }] }),
+                onApprove: (data, actions) => actions.order.capture().then(() => alert('Coins Added!'))
+            }).render('#paypal-button-container');
         }
     </script>
 </body>
