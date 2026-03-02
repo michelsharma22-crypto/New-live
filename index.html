@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YNS GALAXY PRO - Professional</title>
+    <title>YNS GALAXY PRO - Official V3</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -13,206 +13,303 @@
     <style>
         body { background: #050505; color: white; font-family: sans-serif; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .gift-btn { transition: transform 0.2s; }
-        .gift-btn:active { transform: scale(0.8); }
-        
-        /* Gift Animations */
-        @keyframes float-up { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-200px) scale(2); opacity: 0; } }
-        .animate-gift { position: fixed; bottom: 20%; left: 50%; font-size: 50px; animation: float-up 2s forwards; pointer-events: none; z-index: 100; }
-        
         .tab-active { color: #ec4899; text-shadow: 0 0 10px #ec4899; }
-        .hidden { display: none; }
+        @keyframes float-up { 0% { transform: translateY(0) scale(1.2); opacity: 1; } 100% { transform: translateY(-350px) scale(3); opacity: 0; } }
+        .animate-gift { position: fixed; bottom: 30%; left: 50%; font-size: 80px; animation: float-up 2.5s forwards; pointer-events: none; z-index: 200; transform: translateX(-50%); }
+        .notif-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #ec4899; padding: 12px 25px; border-radius: 20px; z-index: 1000; font-weight: bold; font-size: 13px; box-shadow: 0 10px 30px rgba(236,72,153,0.4); animation: slideDown 0.4s ease-out; }
+        @keyframes slideDown { from { transform: translate(-50%, -100%); } to { transform: translate(-50%, 0); } }
+        #local-video { width: 100%; height: 100%; object-fit: cover; background: #000; border-radius: 40px; }
+        .gift-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; cursor: pointer; }
+        .gift-btn:active { transform: scale(0.9); background: rgba(236,72,153,0.3); }
     </style>
 </head>
 <body>
 
+    <div id="notification-container"></div>
+
     <div id="auth-screen" class="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center p-10">
-        <h1 class="text-4xl font-black italic text-pink-500 mb-10">YNS GALAXY</h1>
-        <input id="auth-email" type="email" placeholder="Email" class="w-full bg-zinc-900 p-4 rounded-2xl mb-4 border border-white/10">
-        <input id="auth-pass" type="password" placeholder="Password" class="w-full bg-zinc-900 p-4 rounded-2xl mb-6 border border-white/10">
-        <button onclick="handleAuth('login')" class="w-full bg-pink-600 py-4 rounded-2xl font-bold mb-4">LOGIN</button>
-        <button onclick="handleAuth('register')" class="w-full border border-pink-600 py-4 rounded-2xl font-bold text-pink-500">REGISTER</button>
+        <h1 class="text-6xl font-black italic text-pink-500 mb-2">YNS</h1>
+        <p class="text-[10px] mb-12 tracking-[0.5em] text-zinc-500">GALAXY PRO</p>
+        <input id="auth-name" type="text" placeholder="ඔබේ නම" class="w-full bg-zinc-900 p-4 rounded-2xl mb-4 border border-white/5 outline-none">
+        <input id="auth-email" type="email" placeholder="Email" class="w-full bg-zinc-900 p-4 rounded-2xl mb-4 border border-white/5 outline-none">
+        <input id="auth-pass" type="password" placeholder="Password" class="w-full bg-zinc-900 p-4 rounded-2xl mb-8 border border-white/5 outline-none">
+        <button onclick="handleAuth('login')" class="w-full bg-pink-600 py-4 rounded-2xl font-bold mb-4">ලොගින් වෙන්න</button>
+        <button onclick="handleAuth('register')" class="w-full border border-zinc-800 py-4 rounded-2xl font-bold text-zinc-500">ගිණුමක් හදන්න</button>
     </div>
 
     <div id="app-screen" class="hidden">
-        
-        <header class="p-5 flex justify-between items-center fixed top-0 w-full z-40 bg-black/50">
+        <header class="p-6 flex justify-between items-center fixed top-0 w-full z-40 bg-black/80 backdrop-blur-lg border-b border-white/5">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center font-bold" id="user-initial">U</div>
-                <p class="font-bold text-sm" id="user-display-name">Loading...</p>
+                <div id="user-initial" class="w-10 h-10 bg-gradient-to-tr from-pink-500 to-yellow-500 rounded-full flex items-center justify-center font-bold">?</div>
+                <div>
+                    <p id="user-display-name" class="font-bold text-sm">User</p>
+                    <p class="text-[8px] text-zinc-500 font-bold uppercase tracking-widest">Active Now</p>
+                </div>
             </div>
-            <div class="glass px-4 py-1 rounded-full flex items-center gap-2">
-                <span class="text-blue-400">💎 <span id="user-coins">0</span></span>
+            <div class="glass px-4 py-2 rounded-full border border-pink-500/20">
+                <span class="text-blue-400 font-bold text-xs">💎 <span id="user-coins">0</span></span>
             </div>
         </header>
 
-        <main class="pt-24 pb-32">
-            
-            <div id="tab-home" class="px-5">
-                <div class="bg-gradient-to-r from-pink-600 to-purple-700 p-6 rounded-[30px] mb-8 relative overflow-hidden">
-                    <h2 class="text-xl font-black">Daily Reward!</h2>
-                    <p class="text-sm opacity-80">Claim your 10 free coins today.</p>
-                    <button onclick="claimDailyBonus()" id="daily-btn" class="mt-4 bg-white text-black px-6 py-2 rounded-full font-bold text-xs">CLAIM NOW</button>
+        <main class="pt-28 pb-32">
+            <div id="tab-home" class="px-6">
+                <div class="relative mb-8">
+                    <input type="text" id="search-input" oninput="searchUsers()" placeholder="Search users by name..." class="w-full bg-zinc-900/50 p-4 pl-12 rounded-2xl border border-white/5 outline-none focus:border-pink-500">
+                    <i class="fas fa-search absolute left-5 top-5 text-zinc-500"></i>
                 </div>
-                
-                <h3 class="text-zinc-500 font-bold text-xs uppercase tracking-widest mb-4">Trending Hosts</h3>
-                <div class="grid grid-cols-2 gap-4" id="hosts-list">
-                    </div>
+                <div class="bg-gradient-to-br from-zinc-900 to-black p-6 rounded-[35px] mb-8 border border-white/5 relative overflow-hidden">
+                    <h2 class="text-xl font-black italic">Daily Bonus 🎁</h2>
+                    <button onclick="claimDailyBonus()" class="mt-4 bg-white text-black px-8 py-2.5 rounded-full font-bold text-[10px]">CLAIM 10 COINS</button>
+                    <i class="fas fa-gem absolute -bottom-5 -right-5 text-8xl text-white/5"></i>
+                </div>
+                <h3 class="text-zinc-500 font-bold text-[9px] uppercase tracking-[0.2em] mb-6 px-2">Online Members</h3>
+                <div class="grid grid-cols-2 gap-4" id="users-list"></div>
             </div>
 
-            <div id="tab-live" class="hidden px-5">
-                <div class="relative w-full aspect-[9/16] bg-zinc-900 rounded-[40px] overflow-hidden border border-white/10">
-                    <div id="local-video" class="w-full h-full object-cover"></div>
-                    <div class="absolute bottom-10 w-full px-8">
-                        <button onclick="startSecureLive()" id="live-action-btn" class="w-full bg-pink-600 py-4 rounded-2xl font-black shadow-xl">START LIVE STREAM</button>
+            <div id="tab-live" class="hidden px-6">
+                <div class="relative w-full aspect-[9/16] bg-zinc-950 rounded-[50px] overflow-hidden border border-white/10 shadow-2xl">
+                    <div id="local-video"></div>
+                    <div class="absolute bottom-10 w-full px-10 text-center flex flex-col gap-3">
+                        <button onclick="startSecureLive()" id="live-action-btn" class="w-full bg-pink-600 py-4 rounded-2xl font-black text-sm">START BROADCAST</button>
+                        <button onclick="leaveLive()" id="leave-btn" class="hidden text-zinc-500 font-bold text-[10px] uppercase tracking-widest">End Session</button>
                     </div>
-                    <button onclick="toggleGifts()" class="absolute bottom-10 right-5 w-14 h-14 bg-yellow-500 rounded-full flex items-center justify-center text-xl shadow-2xl">🎁</button>
                 </div>
             </div>
 
             <div id="tab-wallet" class="hidden px-8">
-                <h2 class="text-2xl font-bold mb-6">Wallet & Earnings</h2>
-                <div class="glass p-8 rounded-[40px] mb-6 text-center">
-                    <p class="text-zinc-500 text-sm">Main Balance</p>
-                    <h1 class="text-5xl font-black text-blue-400 my-2">💎 <span id="wallet-balance">0</span></h1>
+                <h2 class="text-3xl font-black mb-8 italic">Wallet</h2>
+                <div class="glass p-10 rounded-[45px] mb-10 text-center">
+                    <p class="text-zinc-500 text-[10px] uppercase tracking-widest mb-2">My Balance</p>
+                    <h1 class="text-6xl font-black">💎 <span id="wallet-balance">0</span></h1>
                 </div>
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <button onclick="buyCoins()" class="bg-white text-black p-5 rounded-3xl font-bold"><i class="fas fa-plus-circle mr-2"></i>Buy Coins</button>
-                    <button onclick="withdrawMoney()" class="glass p-5 rounded-3xl font-bold"><i class="fas fa-university mr-2"></i>Withdraw</button>
+                <div class="grid grid-cols-2 gap-4 mb-10">
+                    <button onclick="buyCoins(100)" class="bg-zinc-900 p-5 rounded-3xl border border-white/5 text-center">
+                        <p class="font-bold text-sm">100 💎</p>
+                        <p class="text-[10px] text-zinc-500 mt-1">Rs. 250</p>
+                    </button>
+                    <button onclick="buyCoins(500)" class="bg-zinc-900 p-5 rounded-3xl border border-white/5 text-center">
+                        <p class="font-bold text-sm">500 💎</p>
+                        <p class="text-[10px] text-zinc-500 mt-1">Rs. 1000</p>
+                    </button>
                 </div>
-                <button onclick="firebase.auth().signOut()" class="w-full text-zinc-600 font-bold text-sm">Logout Account</button>
+                <div class="glass p-8 rounded-[35px]">
+                    <h3 class="font-bold mb-4 text-sm uppercase tracking-widest">Edit Profile</h3>
+                    <input id="edit-name" type="text" class="w-full bg-black/50 p-4 rounded-2xl mb-3 border border-white/5 outline-none text-sm">
+                    <input id="edit-bio" type="text" placeholder="Your Bio" class="w-full bg-black/50 p-4 rounded-2xl mb-4 border border-white/5 outline-none text-sm">
+                    <button onclick="updateProfile()" class="w-full bg-pink-600 py-4 rounded-2xl font-bold text-xs uppercase">Save Changes</button>
+                </div>
+                <button onclick="firebase.auth().signOut()" class="w-full mt-12 text-zinc-700 font-bold text-[10px] uppercase">Sign Out</button>
             </div>
-
         </main>
 
-        <div id="gift-panel" class="hidden fixed inset-0 bg-black/90 z-50 flex items-end">
-            <div class="w-full glass rounded-t-[50px] p-8 border-t border-white/10">
-                <div class="grid grid-cols-4 gap-4 mb-8">
-                    <div onclick="sendGift('🌹', 1)" class="gift-btn text-center p-2">🌹<p class="text-[8px] mt-1">1</p></div>
-                    <div onclick="sendGift('🎈', 5)" class="gift-btn text-center p-2">🎈<p class="text-[8px] mt-1">5</p></div>
-                    <div onclick="sendGift('🍫', 10)" class="gift-btn text-center p-2">🍫<p class="text-[8px] mt-1">10</p></div>
-                    <div onclick="sendGift('💍', 50)" class="gift-btn text-center p-2">💍<p class="text-[8px] mt-1">50</p></div>
-                    <div onclick="sendGift('👑', 100)" class="gift-btn text-center p-2">👑<p class="text-[8px] mt-1">100</p></div>
-                    <div onclick="sendGift('🚗', 500)" class="gift-btn text-center p-2">🚗<p class="text-[8px] mt-1">500</p></div>
-                    <div onclick="sendGift('🚁', 1000)" class="gift-btn text-center p-2">🚁<p class="text-[8px] mt-1">1k</p></div>
-                    <div onclick="sendGift('🏰', 2000)" class="gift-btn text-center p-2">🏰<p class="text-[8px] mt-1">2k</p></div>
-                    <div onclick="sendGift('🚀', 5000)" class="gift-btn text-center p-2">🚀<p class="text-[8px] mt-1">5k</p></div>
-                    <div onclick="sendGift('🦁', 8000)" class="gift-btn text-center p-2">🦁<p class="text-[8px] mt-1">8k</p></div>
-                    <div onclick="sendGift('🦄', 10000)" class="gift-btn text-center p-2">🦄<p class="text-[8px] mt-1">10k</p></div>
-                    <div onclick="sendGift('🌌', 50000)" class="gift-btn text-center p-2">🌌<p class="text-[8px] mt-1">50k</p></div>
-                </div>
-                <button onclick="toggleGifts()" class="w-full text-zinc-500 font-bold text-xs uppercase">Close</button>
+        <div id="profile-overlay" class="hidden fixed inset-0 bg-black z-[80] flex flex-col items-center p-8 backdrop-blur-3xl">
+            <button onclick="closeProfile()" class="absolute top-10 left-6 text-zinc-500 text-2xl"><i class="fas fa-arrow-left"></i></button>
+            <div class="mt-24 text-center w-full">
+                <div id="p-avatar" class="w-36 h-36 bg-zinc-900 rounded-full mx-auto mb-8 flex items-center justify-center text-6xl font-black text-pink-500 border-4 border-zinc-800 shadow-2xl">?</div>
+                <h2 id="p-name" class="text-4xl font-black italic mb-2">Name</h2>
+                <p id="p-bio" class="text-zinc-500 text-sm mb-12 italic">User Bio...</p>
+                <button onclick="toggleGifts()" class="w-full bg-pink-600 py-5 rounded-3xl font-black text-lg">SEND A GIFT 🎁</button>
             </div>
         </div>
 
-        <nav class="fixed bottom-0 w-full glass h-24 flex justify-around items-center px-10 rounded-t-[40px] z-40">
-            <button onclick="switchTab('home')" id="nav-home" class="tab-active text-xl"><i class="fas fa-th-large"></i></button>
+        <div id="gift-panel" class="hidden fixed inset-0 bg-black/95 z-[95] flex items-end">
+            <div class="w-full glass rounded-t-[50px] p-8 pb-12 border-t border-white/10 shadow-2xl">
+                <div class="flex justify-between items-center mb-8 px-4">
+                    <h3 class="font-black italic text-pink-500">SELECT GIFT</h3>
+                    <p class="text-xs font-bold text-blue-400">💎 <span id="gift-balance">0</span></p>
+                </div>
+                <div class="grid grid-cols-4 gap-3 mb-10">
+                    <div onclick="sendGift('🌹', 1)" class="gift-btn text-center p-3 rounded-2xl text-2xl">🌹<p class="text-[9px] mt-1 font-bold text-zinc-500">1</p></div>
+                    <div onclick="sendGift('💋', 5)" class="gift-btn text-center p-3 rounded-2xl text-2xl">💋<p class="text-[9px] mt-1 font-bold text-zinc-500">5</p></div>
+                    <div onclick="sendGift('🎈', 10)" class="gift-btn text-center p-3 rounded-2xl text-2xl">🎈<p class="text-[9px] mt-1 font-bold text-zinc-500">10</p></div>
+                    <div onclick="sendGift('💍', 50)" class="gift-btn text-center p-3 rounded-2xl text-2xl">💍<p class="text-[9px] mt-1 font-bold text-zinc-500">50</p></div>
+                    <div onclick="sendGift('👑', 100)" class="gift-btn text-center p-3 rounded-2xl text-2xl">👑<p class="text-[9px] mt-1 font-bold text-zinc-500">100</p></div>
+                    <div onclick="sendGift('🚗', 500)" class="gift-btn text-center p-3 rounded-2xl text-2xl">🚗<p class="text-[9px] mt-1 font-bold text-zinc-500">500</p></div>
+                    <div onclick="sendGift('🚁', 1000)" class="gift-btn text-center p-3 rounded-2xl text-2xl">🚁<p class="text-[9px] mt-1 font-bold text-zinc-500">1k</p></div>
+                    <div onclick="sendGift('🦁', 5000)" class="gift-btn text-center p-3 rounded-2xl text-2xl">🦁<p class="text-[9px] mt-1 font-bold text-zinc-500">5k</p></div>
+                    <div onclick="sendGift('🚀', 10000)" class="gift-btn text-center p-3 rounded-2xl text-2xl">🚀<p class="text-[9px] mt-1 font-bold text-zinc-500">10k</p></div>
+                    <div onclick="sendGift('🏰', 25000)" class="gift-btn text-center p-3 rounded-2xl text-2xl">🏰<p class="text-[9px] mt-1 font-bold text-zinc-500">25k</p></div>
+                    <div onclick="sendGift('🦄', 50000)" class="gift-btn text-center p-3 rounded-2xl text-2xl">🦄<p class="text-[9px] mt-1 font-bold text-zinc-500">50k</p></div>
+                    <div onclick="sendGift('🌌', 99999)" class="gift-btn text-center p-3 rounded-2xl text-2xl">🌌<p class="text-[9px] mt-1 font-bold text-zinc-500">100k</p></div>
+                </div>
+                <button onclick="toggleGifts()" class="w-full text-zinc-600 font-bold text-[10px] tracking-widest">CANCEL</button>
+            </div>
+        </div>
+
+        <nav class="fixed bottom-0 w-full glass h-24 flex justify-around items-center px-10 rounded-t-[45px] z-40 border-t border-white/5">
+            <button onclick="switchTab('home')" id="nav-home" class="tab-active text-xl"><i class="fas fa-layer-group"></i></button>
             <button onclick="switchTab('live')" id="nav-live" class="text-zinc-600 text-xl"><i class="fas fa-video"></i></button>
             <button onclick="switchTab('wallet')" id="nav-wallet" class="text-zinc-600 text-xl"><i class="fas fa-wallet"></i></button>
         </nav>
     </div>
 
     <script>
-        // CONFIG
         const firebaseConfig = { apiKey: "AIzaSyBwDUe5E8qRY1dbZzUQJu9eCAKBS7YSHVU", authDomain: "live-e6771.firebaseapp.com", projectId: "live-e6771", storageBucket: "live-e6771.firebasestorage.app", messagingSenderId: "570901004231", appId: "1:570901004231:web:220679cf41cf55b98023e2" };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
-        let currentUser = null, localTracks = [];
+        const auth = firebase.auth(), db = firebase.firestore(), client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+        let currentUser = null, localTracks = [], allUsers = [], targetUid = null;
 
-        // AUTH LOGIC
+        auth.onAuthStateChanged(user => {
+            if(user) { currentUser = user; document.getElementById('auth-screen').classList.add('hidden'); document.getElementById('app-screen').classList.remove('hidden'); loadApp(); listenNotifications(); }
+            else { document.getElementById('auth-screen').classList.remove('hidden'); document.getElementById('app-screen').classList.add('hidden'); }
+        });
+
         async function handleAuth(type) {
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-pass').value;
+            const email = document.getElementById('auth-email').value, pass = document.getElementById('auth-pass').value, name = document.getElementById('auth-name').value;
             try {
                 if(type === 'register') {
                     const res = await auth.createUserWithEmailAndPassword(email, pass);
-                    await db.collection('profiles').doc(res.user.uid).set({ coins: 10, lastLogin: Date.now() });
-                } else {
-                    await auth.signInWithEmailAndPassword(email, pass);
-                }
+                    await db.collection('profiles').doc(res.user.uid).set({ displayName: name, coins: 50, bio: "YNS GALAXY Member", isLive: false, lastLogin: Date.now() });
+                } else { await auth.signInWithEmailAndPassword(email, pass); }
             } catch (err) { alert(err.message); }
         }
 
-        auth.onAuthStateChanged(user => {
-            if(user) {
-                currentUser = user;
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app-screen').classList.remove('hidden');
-                syncUserData();
-            } else {
-                document.getElementById('auth-screen').classList.remove('hidden');
-                document.getElementById('app-screen').classList.add('hidden');
-            }
-        });
-
-        async function syncUserData() {
+        function loadApp() {
             db.collection('profiles').doc(currentUser.uid).onSnapshot(doc => {
                 const data = doc.data();
                 document.getElementById('user-coins').innerText = data.coins;
                 document.getElementById('wallet-balance').innerText = data.coins;
-                document.getElementById('user-display-name').innerText = currentUser.email.split('@')[0];
+                document.getElementById('gift-balance').innerText = data.coins;
+                document.getElementById('user-display-name').innerText = data.displayName;
+                document.getElementById('user-initial').innerText = data.displayName[0].toUpperCase();
+                document.getElementById('edit-name').value = data.displayName;
+                document.getElementById('edit-bio').value = data.bio || "";
+            });
+
+            db.collection('profiles').onSnapshot(snap => {
+                allUsers = [];
+                snap.forEach(doc => { if(doc.id !== currentUser.uid) allUsers.push({id: doc.id, ...doc.data()}); });
+                renderUserList(allUsers);
             });
         }
 
-        // DAILY BONUS
-        async function claimDailyBonus() {
-            const ref = db.collection('profiles').doc(currentUser.uid);
-            const doc = await ref.get();
-            const lastLogin = doc.data().lastLogin || 0;
-            const now = Date.now();
-            
-            if (now - lastLogin > 86400000) {
-                await ref.update({ coins: firebase.firestore.FieldValue.increment(10), lastLogin: now });
-                alert("🎁 10 Daily Coins Added!");
-            } else {
-                alert("Wait until tomorrow for more coins!");
+        function renderUserList(users) {
+            const list = document.getElementById('users-list'); list.innerHTML = "";
+            users.forEach(u => {
+                list.innerHTML += `
+                    <div onclick="handleUserClick('${u.id}')" class="bg-zinc-900/40 p-5 rounded-[40px] text-center border border-white/5 relative active:scale-95 transition-all">
+                        ${u.isLive ? '<span class="absolute top-4 right-5 bg-red-600 text-[7px] px-2 py-0.5 rounded-full animate-pulse font-black uppercase">LIVE</span>' : ''}
+                        <div class="w-16 h-16 bg-zinc-800 rounded-full mx-auto mb-3 flex items-center justify-center font-black text-pink-500 border border-white/5">${u.displayName[0].toUpperCase()}</div>
+                        <p class="text-xs font-bold truncate">${u.displayName}</p>
+                    </div>`;
+            });
+        }
+
+        function searchUsers() {
+            const term = document.getElementById('search-input').value.toLowerCase();
+            const filtered = allUsers.filter(u => u.displayName.toLowerCase().includes(term));
+            renderUserList(filtered);
+        }
+
+        async function handleUserClick(uid) {
+            targetUid = uid;
+            const doc = await db.collection('profiles').doc(uid).get();
+            const u = doc.data();
+            if(u.isLive) { joinLive(uid); } 
+            else {
+                document.getElementById('p-name').innerText = u.displayName;
+                document.getElementById('p-avatar').innerText = u.displayName[0].toUpperCase();
+                document.getElementById('p-bio').innerText = u.bio || "No Bio";
+                document.getElementById('profile-overlay').classList.remove('hidden');
             }
         }
 
-        // TAB SWITCHER
-        function switchTab(tab) {
-            document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
-            document.getElementById('tab-'+tab).classList.remove('hidden');
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active'));
-            document.getElementById('nav-'+tab).classList.add('tab-active');
+        async function sendGift(emoji, cost) {
+            const senderRef = db.collection('profiles').doc(currentUser.uid);
+            const receiverRef = db.collection('profiles').doc(targetUid);
+            const senderDoc = await senderRef.get();
+            
+            if(senderDoc.data().coins >= cost) {
+                // සල්ලි කැපීම සහ ලැබෙන කෙනාට එකතු වීම (Feature 13)
+                await senderRef.update({ coins: firebase.firestore.FieldValue.increment(-cost) });
+                await receiverRef.update({ coins: firebase.firestore.FieldValue.increment(cost) });
+                
+                // නොටිපිකේෂන් එකක් යැවීම
+                await db.collection('notifications').add({
+                    to: targetUid,
+                    fromName: senderDoc.data().displayName,
+                    msg: `${senderDoc.data().displayName} විසින් ඔබට ${emoji} තෑග්ගක් එවා ඇත!`,
+                    time: Date.now()
+                });
+
+                const a = document.createElement('div'); a.className = 'animate-gift'; a.innerText = emoji;
+                document.body.appendChild(a); setTimeout(() => a.remove(), 2500);
+                toggleGifts();
+            } else { showToast("ප්‍රමාණවත් කොයින් නැත! 💎"); }
         }
 
-        function toggleGifts() { document.getElementById('gift-panel').classList.toggle('hidden'); }
+        async function updateProfile() {
+            const name = document.getElementById('edit-name').value, bio = document.getElementById('edit-bio').value;
+            await db.collection('profiles').doc(currentUser.uid).update({ displayName: name, bio: bio });
+            showToast("ප්‍රොෆයිල් එක යාවත්කාලීන විය! ✅");
+        }
 
-        // GIFT ANIMATION
-        function sendGift(emoji, cost) {
-            const coinRef = db.collection('profiles').doc(currentUser.uid);
-            coinRef.get().then(doc => {
-                if(doc.data().coins >= cost) {
-                    coinRef.update({ coins: firebase.firestore.FieldValue.increment(-cost) });
-                    const ani = document.createElement('div');
-                    ani.className = 'animate-gift';
-                    ani.innerText = emoji;
-                    document.body.appendChild(ani);
-                    setTimeout(() => ani.remove(), 2000);
-                    toggleGifts();
-                } else { alert("Insufficient Coins!"); }
+        async function buyCoins(amt) {
+            await db.collection('profiles').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(amt) });
+            showToast(`ඔබ 💎 ${amt} ක් මිලදී ගත්තා!`);
+        }
+
+        function listenNotifications() {
+            db.collection('notifications').where('to', '==', currentUser.uid).orderBy('time', 'desc').limit(1).onSnapshot(snap => {
+                snap.docChanges().forEach(change => { if(change.type === "added") showToast(change.doc.data().msg); });
             });
         }
 
-        // SECURE LIVE
+        function showToast(m) {
+            const t = document.createElement('div'); t.className = 'notif-toast'; t.innerText = m;
+            document.getElementById('notification-container').appendChild(t);
+            setTimeout(() => t.remove(), 4000);
+        }
+
+        // AGORA LIVE LOGIC
         async function startSecureLive() {
             try {
-                const res = await fetch(`/api/generate-token?channelName=main&uid=0`);
+                const res = await fetch(`/api/generate-token?channelName=${currentUser.uid}&uid=0`);
                 const { token } = await res.json();
-                await client.join("d369ed90f2c04b599b9e680fbe3ca788", "main", token, 0);
+                await client.join("d369ed90f2c04b599b9e680fbe3ca788", currentUser.uid, token, 0);
                 localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
                 localTracks[1].play('local-video');
                 await client.publish(localTracks);
-                document.getElementById('live-action-btn').innerText = "STOP LIVE";
-                document.getElementById('live-action-btn').onclick = () => location.reload();
-            } catch (err) { alert("Camera Error: Check Vercel Key Settings."); }
+                await db.collection('profiles').doc(currentUser.uid).update({ isLive: true });
+                document.getElementById('live-action-btn').classList.add('hidden');
+                document.getElementById('leave-btn').classList.remove('hidden');
+            } catch(e) { alert("Live පටන් ගැනීමට නොහැක."); }
         }
 
-        function buyCoins() { alert("Redirecting to PayPal/Payment Gateway..."); }
-        function withdrawMoney() { alert("Withdrawal: Minimum $10 (1000 Coins) required."); }
+        async function joinLive(hostUid) {
+            targetUid = hostUid; switchTab('live');
+            const res = await fetch(`/api/generate-token?channelName=${hostUid}&uid=0`);
+            const { token } = await res.json();
+            await client.join("d369ed90f2c04b599b9e680fbe3ca788", hostUid, token, 0);
+            client.on("user-published", async (u, type) => {
+                await client.subscribe(u, type);
+                if(type === "video") u.videoTrack.play("local-video");
+                if(type === "audio") u.audioTrack.play();
+            });
+        }
+
+        async function leaveLive() {
+            localTracks.forEach(t => { t.stop(); t.close(); });
+            await client.leave();
+            await db.collection('profiles').doc(currentUser.uid).update({ isLive: false });
+            location.reload();
+        }
+
+        function switchTab(t) {
+            document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
+            document.getElementById('tab-'+t).classList.remove('hidden');
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active'));
+            document.getElementById('nav-'+t).classList.add('tab-active');
+        }
+        function toggleGifts() { document.getElementById('gift-panel').classList.toggle('hidden'); }
+        function closeProfile() { document.getElementById('profile-overlay').classList.add('hidden'); }
+        async function claimDailyBonus() {
+            const ref = db.collection('profiles').doc(currentUser.uid), doc = await ref.get(), last = doc.data().lastLogin || 0;
+            if(Date.now() - last > 86400000) {
+                await ref.update({ coins: firebase.firestore.FieldValue.increment(10), lastLogin: Date.now() });
+                showToast("🎁 කොයින් 10ක් ලැබුණා!");
+            } else showToast("හෙට නැවත උත්සාහ කරන්න.");
+        }
     </script>
 </body>
 </html>
