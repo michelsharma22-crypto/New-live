@@ -263,6 +263,11 @@
         const t = document.createElement('div'); t.className = 'notif-toast'; t.innerText = m;
         document.getElementById('toast-box').appendChild(t); setTimeout(() => t.remove(), 3000);
     }
+    function showSection(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    document.getElementById(id + '-screen').classList.remove('hidden');
+}
+
     function toggleGifts() { document.getElementById('gift-panel').classList.toggle('hidden'); }
     function openEdit() { document.getElementById('profile-edit').classList.remove('hidden'); }
     function closeEdit() { document.getElementById('profile-edit').classList.add('hidden'); }
