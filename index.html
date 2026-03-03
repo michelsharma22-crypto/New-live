@@ -338,10 +338,11 @@ async function uploadPhoto(file) {
 // --- LIVE STREAMING (Feature 6, 14, 18) ---
 async function startLive() {
     try {
-        updateHostUI(currentUser.displayName, currentUser.photoURL);
+        
         currentHost = currentUser.uid;
         document.getElementById('live-screen').classList.remove('hidden');
         document.getElementById('local-player').classList.remove('hidden');
+        updateHostUI(currentUser.displayName, currentUser.photoURL);
         
         await client.join("1dad2898a8364e9c94875beb9823d2b7", currentHost, null, currentHost);
         localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
