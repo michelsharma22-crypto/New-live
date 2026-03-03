@@ -242,30 +242,48 @@
     </div>
 </div>
 
-<div id="live-screen" class="hidden fixed inset-0 z-[2000] bg-black">
-    <div id="remote-player"></div>
-    <div id="local-player"></div>
+<div id="live-screen" class="fixed inset-0 z-[3000] hidden bg-black">
+    <div id="remote-player" class="absolute inset-0 bg-zinc-900"></div>
+    <div id="local-player" class="absolute inset-0 opacity-0 pointer-events-none"></div>
 
-    <div class="absolute inset-0 flex flex-col justify-between p-6 pointer-events-none">
-        <div class="flex justify-between items-start pointer-events-auto">
-            <div class="glass p-1 pr-4 rounded-full flex items-center gap-3">
-                <img id="host-img" class="w-10 h-10 rounded-full border-2 border-pink-500">
-                <div><p id="host-name" class="text-xs font-bold">Host</p><div class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-red-600 rounded-full live-tag"></span><span class="text-[9px] uppercase">Live</span></div></div>
+    <div class="absolute top-10 left-4 right-4 flex justify-between items-start pointer-events-none">
+        <div class="flex items-center gap-3 bg-black/40 backdrop-blur-md p-1 pr-4 rounded-full border border-white/10 pointer-events-auto">
+            <img id="host-img" src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full object-cover border-2 border-red-500">
+            <div>
+                <p id="host-name" class="text-white text-[10px] font-bold leading-none">Live Host</p>
+                <p class="text-red-500 text-[9px] font-black uppercase mt-1">🔴 LIVE</p>
             </div>
-            <button onclick="exitLive()" class="w-10 h-10 glass rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
         </div>
-
-        <div class="flex flex-col gap-4 pointer-events-auto">
-            <div id="chat-overlay" class="h-40 overflow-y-auto text-sm space-y-2 flex flex-col justify-end mask-fade"></div>
-            
-            <div class="flex gap-2">
-                <input id="chat-input" type="text" placeholder="Type a message..." class="flex-grow glass p-4 rounded-2xl outline-none border border-white/10 text-sm">
-                
-                <button id="btn-mic" onclick="toggleMic()" class="w-14 h-14 glass rounded-2xl flex items-center justify-center text-white"><i class="fas fa-microphone"></i></button>
-                <button id="btn-cam" onclick="toggleCam()" class="w-14 h-14 glass rounded-2xl flex items-center justify-center text-white"><i class="fas fa-video"></i></button>
-                
-                <button onclick="showGiftPanel()" class="w-14 h-14 bg-yellow-500 rounded-2xl flex items-center justify-center text-black"><i class="fas fa-gift"></i></button>
+        
+        <div class="flex gap-2 pointer-events-auto">
+            <div class="bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
+                <span class="text-white text-[11px] font-bold">👤 <span id="viewer-count">0</span></span>
             </div>
+            <div onclick="exitLive()" class="bg-red-600 px-4 py-1.5 rounded-full flex items-center shadow-lg cursor-pointer">
+                <span class="text-white text-[11px] font-black uppercase">END</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="absolute top-24 right-4 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2 pointer-events-none">
+        <span class="text-yellow-400 text-xs font-bold">💎 <span id="live-earnings" class="text-white">0</span></span>
+    </div>
+
+    <div class="absolute bottom-8 left-4 right-4 flex flex-col gap-4">
+        <div id="gift-display-area" class="h-24 flex items-end gap-2 overflow-hidden pointer-events-none px-2"></div>
+
+        <div class="flex items-center gap-3">
+            <input id="chat-input" type="text" placeholder="Send a message..." class="flex-1 bg-white/20 backdrop-blur-xl border border-white/30 p-4 rounded-full text-white text-sm outline-none placeholder:text-white/60">
+            
+            <button onclick="toggleMic()" id="btn-mic" class="w-12 h-12 bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center text-white border border-white/30">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button onclick="toggleCam()" id="btn-cam" class="w-12 h-12 bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center text-white border border-white/30">
+                <i class="fas fa-video"></i>
+            </button>
+            <button onclick="showGiftPanel()" class="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center text-white shadow-xl shadow-red-600/40">
+                <i class="fas fa-gift text-xl"></i>
+            </button>
         </div>
     </div>
 </div>
