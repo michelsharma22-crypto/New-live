@@ -13,7 +13,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-        <style>
+    <style>
         body { background: #ffffff; color: #000000; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px); border: 1px solid rgba(239, 68, 68, 0.2); }
         .screen { display: none; height: 100vh; overflow-y: auto; padding-bottom: 100px; background: #ffffff; }
@@ -28,30 +28,27 @@
 <body>
 
 <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-[3000]"></div>
+
 <div id="auth-screen" class="fixed inset-0 z-[2500] bg-white flex flex-col items-center justify-center p-8">
-    <h1 class="text-6xl font-black italic text-red-600 mb-2 text-center">GALAXY</h1>
+    <h1 class="text-6xl font-black italic text-red-600 mb-2">GALAXY</h1>
     <p class="text-zinc-500 mb-10 tracking-widest text-xs uppercase font-bold">Live Streaming System</p>
     
     <div class="w-full max-w-sm space-y-4">
-        <div id="reg-name-container">
-            <input id="reg-name" type="text" placeholder="Full Name" class="w-full bg-gray-100 p-4 rounded-2xl border border-gray-200 outline-none text-black">
-        </div>
-        
+        <input id="reg-name" type="text" placeholder="Full Name" class="w-full bg-gray-100 p-4 rounded-2xl border border-gray-200 outline-none text-black">
         <input id="auth-email" type="email" placeholder="Email Address" class="w-full bg-gray-100 p-4 rounded-2xl border border-gray-200 outline-none text-black">
         <input id="auth-pass" type="password" placeholder="Password" class="w-full bg-gray-100 p-4 rounded-2xl border border-gray-200 outline-none text-black">
-        <button onclick="toggleAuth()" class="w-full text-zinc-500 py-2 font-medium text-sm">Already have an account? <span class="text-red-600 font-bold">Login</span></button>
-        <p class="text-center text-zinc-500 text-sm">
-            <span id="auth-msg">Already have an account?</span> 
-            <span id="auth-toggle-btn" onclick="toggleAuth()" class="text-red-600 font-bold cursor-pointer">Login</span>
-        </p>
+        
+        <button onclick="handleAuth('register')" class="w-full bg-red-600 py-4 rounded-2xl text-white font-bold shadow-lg shadow-red-200 active:scale-95 transition">GET STARTED</button>
+        <button onclick="handleAuth('login')" class="w-full text-zinc-500 py-2 font-medium text-sm">Already have an account? <span class="text-red-600 font-bold">Login</span></button>
     </div>
 </div>
+
 
 <div id="home-screen" class="screen p-4">
     <div class="flex justify-between items-center py-4 mb-4">
         <h2 class="text-xl font-bold italic">GALAXY <span class="text-pink-500">LIVE</span></h2>
         <div class="glass px-4 py-2 rounded-full flex items-center gap-2">
-            <span class="text-yellow-400">💎</span> <span id="nav-coins">0</span>
+            <span class="text-yellow-400">ðŸ’Ž</span> <span id="nav-coins">0</span>
         </div>
     </div>
 
@@ -71,7 +68,9 @@
     <h3 class="text-zinc-500 text-xs font-bold uppercase mb-4 tracking-widest">Active Members</h3>
     <div id="user-grid" class="grid grid-cols-2 gap-4"></div>
 </div>
-,<div id="wallet-screen" class="screen p-6 text-center">
+</div>
+
+<div id="wallet-screen" class="screen p-6 text-center">
     <h2 class="text-2xl font-bold mb-8">My Balance</h2>
     <div class="mt-8 p-4 bg-zinc-800 rounded-2xl border border-zinc-700">
     <h3 class="text-left font-bold mb-4">Withdraw Earnings</h3>
@@ -80,138 +79,48 @@
     <button onclick="requestWithdraw()" class="w-full bg-white text-black py-4 rounded-xl font-bold">Request Withdrawal</button>
 </div>
 
-    <div class="mt-8 p-4 bg-zinc-800 rounded-2xl border border-zinc-700">
-    <h3 class="text-left font-bold mb-4">Withdraw Earnings</h3>
-    <input id="withdraw-amount" type="number" placeholder="Coins Amount" class="w-full bg-zinc-900 p-4 rounded-xl mb-2 outline-none">
-    <input id="paypal-email" type="email" placeholder="PayPal Email Address" class="w-full bg-zinc-900 p-4 rounded-xl mb-4 outline-none">
-    <button onclick="requestWithdraw()" class="w-full bg-white text-black py-4 rounded-xl font-bold">Request Withdrawal</button>
-</div>
 
     <div class="glass py-12 rounded-[40px] mb-8">
         <p class="text-zinc-500 text-sm mb-2">Total Diamonds</p>
-        <h1 class="text-6xl font-bold text-pink-500 mb-4">💎 <span id="wallet-coins">0</span></h1>
+        <h1 class="text-6xl font-bold text-pink-500 mb-4">USD<span id="wallet-coins">0</span></h1>
         <button onclick="showWithdraw()" class="text-zinc-400 text-xs underline">Withdraw to Cash (LKR)</button>
     </div>
-
+    
     <div id="top-up-section" class="text-left">
         <h3 class="font-bold mb-4">Top Up Package</h3>
-        <div class="grid grid-cols-1 gap-4 mb-6">
-    <div onclick="initPayPal(25.00, 1500)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
-        <div><p class="font-bold">1500 Coins</p><p class="text-xs text-zinc-500">$25.00 USD</p></div>
-        <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
+        <div id="top-up-section" class="text-left mt-10">
+    <h3 class="font-bold mb-4">Select Top Up Package</h3>
+    
+    <div class="grid grid-cols-1 gap-4 mb-6">
+        <div onclick="initPayPal(1.00, 100)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
+            <div><p class="font-bold">100 Coins</p><p class="text-xs text-zinc-500">$1.00 USD</p></div>
+            <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
+        </div>
+
+        <div onclick="initPayPal(25.00, 1500)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
+            <div><p class="font-bold">1500 Coins</p><p class="text-xs text-zinc-500">$25.00 USD</p></div>
+            <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
+        </div>
+
+        <div onclick="initPayPal(50.00, 3500)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
+            <div><p class="font-bold">3500 Coins</p><p class="text-xs text-zinc-500">$50.00 USD</p></div>
+            <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
+        </div>
+
+        <div onclick="initPayPal(100.00, 8000)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
+            <div><p class="font-bold">8000 Coins</p><p class="text-xs text-zinc-500">$100.00 USD</p></div>
+            <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
+        </div>
+
+        <div onclick="initPayPal(250.00, 20000)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer border border-yellow-500/30 hover:border-yellow-500 transition">
+            <div><p class="text-yellow-500 text-[10px] font-bold">VIP PACK</p><p class="font-bold">20,000 Coins</p><p class="text-xs text-zinc-500">$250.00 USD</p></div>
+            <div class="bg-yellow-600 px-6 py-2 rounded-xl font-bold text-black">BUY</div>
+        </div>
     </div>
 
-    <div onclick="initPayPal(50.00, 3500)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
-        <div><p class="font-bold">3500 Coins</p><p class="text-xs text-zinc-500">$50.00 USD</p></div>
-        <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(100.00, 8000)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
-        <div><p class="font-bold">8000 Coins</p><p class="text-xs text-zinc-500">$100.00 USD</p></div>
-        <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(250.00, 20000)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition border border-yellow-500/30">
-        <div><p class="font-bold text-yellow-500 text-sm">VIP PACK</p><p class="font-bold">20,000 Coins</p><p class="text-xs text-zinc-500">$250.00 USD</p></div>
-        <div class="bg-yellow-600 px-6 py-2 rounded-xl font-bold text-black">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(500.00, 50000)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition border border-purple-500/30">
-        <div><p class="font-bold text-purple-400 text-sm">GALAXY PACK</p><p class="font-bold">50,000 Coins</p><p class="text-xs text-zinc-500">$500.00 USD</p></div>
-        <div class="bg-purple-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
+    <div id="paypal-button-container" class="mt-4"></div>
 </div>
-
         <div class="grid grid-cols-1 gap-4 mb-6">
-    <div onclick="initPayPal(25.00, 1500)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
-        <div><p class="font-bold">1500 Coins</p><p class="text-xs text-zinc-500">$25.00 USD</p></div>
-        <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(50.00, 3500)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
-        <div><p class="font-bold">3500 Coins</p><p class="text-xs text-zinc-500">$50.00 USD</p></div>
-        <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(100.00, 8000)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
-        <div><p class="font-bold">8000 Coins</p><p class="text-xs text-zinc-500">$100.00 USD</p></div>
-        <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(250.00, 20000)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition border border-yellow-500/30">
-        <div><p class="font-bold text-yellow-500 text-sm">VIP PACK</p><p class="font-bold">20,000 Coins</p><p class="text-xs text-zinc-500">$250.00 USD</p></div>
-        <div class="bg-yellow-600 px-6 py-2 rounded-xl font-bold text-black">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(500.00, 50000)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition border border-purple-500/30">
-        <div><p class="font-bold text-purple-400 text-sm">GALAXY PACK</p><p class="font-bold">50,000 Coins</p><p class="text-xs text-zinc-500">$500.00 USD</p></div>
-        <div class="bg-purple-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
-</div>
-
-        <div class="grid grid-cols-1 gap-4 mb-6">
-    <div onclick="initPayPal(25.00, 1500)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
-        <div><p class="font-bold">1500 Coins</p><p class="text-xs text-zinc-500">$25.00 USD</p></div>
-        <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(50.00, 3500)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
-        <div><p class="font-bold">3500 Coins</p><p class="text-xs text-zinc-500">$50.00 USD</p></div>
-        <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(100.00, 8000)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
-        <div><p class="font-bold">8000 Coins</p><p class="text-xs text-zinc-500">$100.00 USD</p></div>
-        <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(250.00, 20000)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition border border-yellow-500/30">
-        <div><p class="font-bold text-yellow-500 text-sm">VIP PACK</p><p class="font-bold">20,000 Coins</p><p class="text-xs text-zinc-500">$250.00 USD</p></div>
-        <div class="bg-yellow-600 px-6 py-2 rounded-xl font-bold text-black">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(500.00, 50000)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition border border-purple-500/30">
-        <div><p class="font-bold text-purple-400 text-sm">GALAXY PACK</p><p class="font-bold">50,000 Coins</p><p class="text-xs text-zinc-500">$500.00 USD</p></div>
-        <div class="bg-purple-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
-</div>
-
-        <div class="grid grid-cols-1 gap-4 mb-6">
-    <div onclick="initPayPal(25.00, 1500)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
-        <div><p class="font-bold">1500 Coins</p><p class="text-xs text-zinc-500">$25.00 USD</p></div>
-        <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(50.00, 3500)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
-        <div><p class="font-bold">3500 Coins</p><p class="text-xs text-zinc-500">$50.00 USD</p></div>
-        <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(100.00, 8000)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
-        <div><p class="font-bold">8000 Coins</p><p class="text-xs text-zinc-500">$100.00 USD</p></div>
-        <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(250.00, 20000)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition border border-yellow-500/30">
-        <div><p class="font-bold text-yellow-500 text-sm">VIP PACK</p><p class="font-bold">20,000 Coins</p><p class="text-xs text-zinc-500">$250.00 USD</p></div>
-        <div class="bg-yellow-600 px-6 py-2 rounded-xl font-bold text-black">BUY</div>
-    </div>
-
-    <div onclick="initPayPal(500.00, 50000)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition border border-purple-500/30">
-        <div><p class="font-bold text-purple-400 text-sm">GALAXY PACK</p><p class="font-bold">50,000 Coins</p><p class="text-xs text-zinc-500">$500.00 USD</p></div>
-        <div class="bg-purple-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-    </div>
-</div>
-
-        <div class="grid grid-cols-1 gap-4 mb-6">
-            <div onclick="initPayPal(2.50, 100)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
-                <div><p class="font-bold">100 Coins</p><p class="text-xs text-zinc-500">$2.50 USD</p></div>
-                <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-            </div>
-            <div onclick="initPayPal(10.00, 500)" class="glass p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:border-pink-500 transition">
-                <div><p class="font-bold">500 Coins</p><p class="text-xs text-zinc-500">$10.00 USD</p></div>
-                <div class="bg-pink-600 px-6 py-2 rounded-xl font-bold">BUY</div>
-            </div>
         </div>
         <div id="paypal-button-container"></div>
     </div>
@@ -245,48 +154,30 @@
     </div>
 </div>
 
-<div id="live-screen" class="fixed inset-0 z-[3000] hidden bg-black">
-    <div id="remote-player" class="absolute inset-0 bg-zinc-900"></div>
-    <div id="local-player" class="absolute inset-0 opacity-0 pointer-events-none"></div>
+<div id="live-screen" class="hidden fixed inset-0 z-[2000] bg-black">
+    <div id="remote-player"></div>
+    <div id="local-player"></div>
 
-    <div class="absolute top-10 left-4 right-4 flex justify-between items-start pointer-events-none">
-        <div class="flex items-center gap-3 bg-black/40 backdrop-blur-md p-1 pr-4 rounded-full border border-white/10 pointer-events-auto">
-            <img id="host-img" src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full object-cover border-2 border-red-500">
-            <div>
-                <p id="host-name" class="text-white text-[10px] font-bold leading-none">Live Host</p>
-                <p class="text-red-500 text-[9px] font-black uppercase mt-1">🔴 LIVE</p>
+    <div class="absolute inset-0 flex flex-col justify-between p-6 pointer-events-none">
+        <div class="flex justify-between items-start pointer-events-auto">
+            <div class="glass p-1 pr-4 rounded-full flex items-center gap-3">
+                <img id="host-img" class="w-10 h-10 rounded-full border-2 border-pink-500">
+                <div><p id="host-name" class="text-xs font-bold">Host</p><div class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-red-600 rounded-full live-tag"></span><span class="text-[9px] uppercase">Live</span></div></div>
             </div>
+            <button onclick="exitLive()" class="w-10 h-10 glass rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
         </div>
-        
-        <div class="flex gap-2 pointer-events-auto">
-            <div class="bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
-                <span class="text-white text-[11px] font-bold">👤 <span id="viewer-count">0</span></span>
-            </div>
-            <div onclick="exitLive()" class="bg-red-600 px-4 py-1.5 rounded-full flex items-center shadow-lg cursor-pointer">
-                <span class="text-white text-[11px] font-black uppercase">END</span>
-            </div>
-        </div>
-    </div>
 
-    <div class="absolute top-24 right-4 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2 pointer-events-none">
-        <span class="text-yellow-400 text-xs font-bold">💎 <span id="live-earnings" class="text-white">0</span></span>
-    </div>
-
-    <div class="absolute bottom-8 left-4 right-4 flex flex-col gap-4">
-        <div id="gift-display-area" class="h-24 flex items-end gap-2 overflow-hidden pointer-events-none px-2"></div>
-
-        <div class="flex items-center gap-3">
-            <input id="chat-input" type="text" placeholder="Send a message..." class="flex-1 bg-white/20 backdrop-blur-xl border border-white/30 p-4 rounded-full text-white text-sm outline-none placeholder:text-white/60">
+        <div class="flex flex-col gap-4 pointer-events-auto">
+            <div id="chat-overlay" class="h-40 overflow-y-auto text-sm space-y-2 flex flex-col justify-end mask-fade"></div>
             
-            <button onclick="toggleMic()" id="btn-mic" class="w-12 h-12 bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center text-white border border-white/30">
-                <i class="fas fa-microphone"></i>
-            </button>
-            <button onclick="toggleCam()" id="btn-cam" class="w-12 h-12 bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center text-white border border-white/30">
-                <i class="fas fa-video"></i>
-            </button>
-            <button onclick="showGiftPanel()" class="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center text-white shadow-xl shadow-red-600/40">
-                <i class="fas fa-gift text-xl"></i>
-            </button>
+            <div class="flex gap-2">
+                <input id="chat-input" type="text" placeholder="Type a message..." class="flex-grow glass p-4 rounded-2xl outline-none border border-white/10 text-sm">
+                
+                <button id="btn-mic" onclick="toggleMic()" class="w-14 h-14 glass rounded-2xl flex items-center justify-center text-white"><i class="fas fa-microphone"></i></button>
+                <button id="btn-cam" onclick="toggleCam()" class="w-14 h-14 glass rounded-2xl flex items-center justify-center text-white"><i class="fas fa-video"></i></button>
+                
+                <button onclick="showGiftPanel()" class="w-14 h-14 bg-yellow-500 rounded-2xl flex items-center justify-center text-black"><i class="fas fa-gift"></i></button>
+            </div>
         </div>
     </div>
 </div>
@@ -295,18 +186,18 @@
     <div class="absolute inset-0 bg-black/60" onclick="hideGiftPanel()"></div>
     <div class="w-full glass rounded-t-[40px] p-8 pb-12 relative z-10 border-t border-white/10">
         <div class="grid grid-cols-4 gap-4 max-h-60 overflow-y-auto mb-4">
-            <div onclick="sendGift('🌹', 1)" class="flex flex-col items-center p-3 glass rounded-2xl">🌹<span class="text-[10px] mt-1">1</span></div>
-            <div onclick="sendGift('💋', 5)" class="flex flex-col items-center p-3 glass rounded-2xl">💋<span class="text-[10px] mt-1">5</span></div>
-            <div onclick="sendGift('🎈', 10)" class="flex flex-col items-center p-3 glass rounded-2xl">🎈<span class="text-[10px] mt-1">10</span></div>
-            <div onclick="sendGift('💍', 50)" class="flex flex-col items-center p-3 glass rounded-2xl">💍<span class="text-[10px] mt-1">50</span></div>
-            <div onclick="sendGift('👑', 100)" class="flex flex-col items-center p-3 glass rounded-2xl">👑<span class="text-[10px] mt-1">100</span></div>
-            <div onclick="sendGift('🚗', 500)" class="flex flex-col items-center p-3 glass rounded-2xl">🚗<span class="text-[10px] mt-1">500</span></div>
-            <div onclick="sendGift('🚁', 1000)" class="flex flex-col items-center p-3 glass rounded-2xl">🚁<span class="text-[10px] mt-1">1000</span></div>
-            <div onclick="sendGift('🦁', 2000)" class="flex flex-col items-center p-3 glass rounded-2xl">🦁<span class="text-[10px] mt-1">2000</span></div>
-            <div onclick="sendGift('🚀', 5000)" class="flex flex-col items-center p-3 glass rounded-2xl">🚀<span class="text-[10px] mt-1">5000</span></div>
-            <div onclick="sendGift('🏰', 10000)" class="flex flex-col items-center p-3 glass rounded-2xl">🏰<span class="text-[10px] mt-1">10000</span></div>
-            <div onclick="sendGift('🦄', 15000)" class="flex flex-col items-center p-3 glass rounded-2xl">🦄<span class="text-[10px] mt-1">15000</span></div>
-            <div onclick="sendGift('🌌', 50000)" class="flex flex-col items-center p-3 glass rounded-2xl">🌌<span class="text-[10px] mt-1">50000</span></div>
+            <div onclick="sendGift('ðŸŒ¹', 1)" class="flex flex-col items-center p-3 glass rounded-2xl">ðŸŒ¹<span class="text-[10px] mt-1">1</span></div>
+            <div onclick="sendGift('ðŸ’‹', 5)" class="flex flex-col items-center p-3 glass rounded-2xl">ðŸ’‹<span class="text-[10px] mt-1">5</span></div>
+            <div onclick="sendGift('ðŸŽˆ', 10)" class="flex flex-col items-center p-3 glass rounded-2xl">ðŸŽˆ<span class="text-[10px] mt-1">10</span></div>
+            <div onclick="sendGift('ðŸ’', 50)" class="flex flex-col items-center p-3 glass rounded-2xl">ðŸ’<span class="text-[10px] mt-1">50</span></div>
+            <div onclick="sendGift('ðŸ‘‘', 100)" class="flex flex-col items-center p-3 glass rounded-2xl">ðŸ‘‘<span class="text-[10px] mt-1">100</span></div>
+            <div onclick="sendGift('ðŸš—', 500)" class="flex flex-col items-center p-3 glass rounded-2xl">ðŸš—<span class="text-[10px] mt-1">500</span></div>
+            <div onclick="sendGift('ðŸš', 1000)" class="flex flex-col items-center p-3 glass rounded-2xl">ðŸš<span class="text-[10px] mt-1">1000</span></div>
+            <div onclick="sendGift('ðŸ¦', 2000)" class="flex flex-col items-center p-3 glass rounded-2xl">ðŸ¦<span class="text-[10px] mt-1">2000</span></div>
+            <div onclick="sendGift('ðŸš€', 5000)" class="flex flex-col items-center p-3 glass rounded-2xl">ðŸš€<span class="text-[10px] mt-1">5000</span></div>
+            <div onclick="sendGift('ðŸ°', 10000)" class="flex flex-col items-center p-3 glass rounded-2xl">ðŸ°<span class="text-[10px] mt-1">10000</span></div>
+            <div onclick="sendGift('ðŸ¦„', 15000)" class="flex flex-col items-center p-3 glass rounded-2xl">ðŸ¦„<span class="text-[10px] mt-1">15000</span></div>
+            <div onclick="sendGift('ðŸŒŒ', 50000)" class="flex flex-col items-center p-3 glass rounded-2xl">ðŸŒŒ<span class="text-[10px] mt-1">50000</span></div>
         </div>
     </div>
 </div>
@@ -345,42 +236,19 @@ async function handleAuth(type) {
     const pass = document.getElementById('auth-pass').value;
     const name = document.getElementById('reg-name').value;
 
-    if (!email || !pass) return toast("Please fill all fields!");
-
     try {
         if (type === 'register') {
-            if (!name) return toast("Enter your name!");
             const res = await auth.createUserWithEmailAndPassword(email, pass);
             await db.collection('profiles').doc(res.user.uid).set({
-                uid: res.user.uid, displayName: name, coins: 50,
+                uid: res.user.uid, displayName: name, coins: 50, // Feature 2
                 bio: "New Galaxy User", photoURL: "https://via.placeholder.com/150",
                 country: "SL", age: 18, islive: false, lastBonus: 0
             });
-            toast("Registered! 💎 50 Bonus Received.");
+            toast("Registered! ðŸ’Ž50 Bonus Received.");
         } else {
-            // මේ කොටස තමයි ලොගින් වෙන්න උදව් වෙන්නේ
             await auth.signInWithEmailAndPassword(email, pass);
-            toast("Welcome Back!");
         }
     } catch (e) { toast(e.message); }
-}
-let isLoginMode = false;
-
-function toggleAuth() {
-    isLoginMode = !isLoginMode;
-    const nameField = document.getElementById('reg-name').parentElement;
-    const mainBtn = document.querySelector('button[onclick*="handleAuth"]');
-    const toggleBtn = document.querySelector('button[onclick*="toggleAuth"] span') || document.querySelector('.text-red-600');
-
-    if (isLoginMode) {
-        nameField.style.display = 'none'; 
-        mainBtn.innerText = 'LOGIN';
-        mainBtn.setAttribute('onclick', "handleAuth('login')");
-    } else {
-        nameField.style.display = 'block';
-        mainBtn.innerText = 'GET STARTED';
-        mainBtn.setAttribute('onclick', "handleAuth('register')");
-    }
 }
 
 // --- NAVIGATION & SEARCH (Feature 11, 17) ---
@@ -433,7 +301,7 @@ async function uploadPhoto(file) {
     const data = await res.json();
     await db.collection('profiles').doc(currentUser.uid).update({ photoURL: data.secure_url });
     document.getElementById('edit-preview').src = data.secure_url;
-    toast("Profile Photo Updated! ✨");
+    toast("Profile Photo Updated! âœ¨");
 }
 
 // --- LIVE STREAMING (Feature 6, 14, 18) ---
@@ -449,40 +317,22 @@ async function startLive() {
         await client.publish(localTracks);
         
         await db.collection('profiles').doc(currentUser.uid).update({ islive: true });
-        toast("You are now LIVE! 🔴");
+        toast("You are now LIVE! ðŸ”´");
     } catch (e) { toast("Stream Error: " + e.message); }
 }
 
- // --- NEW MUTE & CAMERA CONTROLS ---
-let micEnabled = true;
-let camEnabled = true;
-
 function toggleMic() {
     micEnabled = !micEnabled;
-    if(localTracks[0]) localTracks[0].setEnabled(micEnabled);
-    
-    const micBtn = document.getElementById('btn-mic');
-    // මියුට් කළ විට අයිකනය රතු පාට වේ
-    micBtn.innerHTML = micEnabled ? 
-        '<i class="fas fa-microphone text-white"></i>' : 
-        '<i class="fas fa-microphone-slash text-red-600"></i>';
-    
-    toast(micEnabled ? "Mic On" : "Mic Muted");
+    localTracks[0].setEnabled(micEnabled);
+    document.getElementById('btn-mic').innerHTML = micEnabled ? '<i class="fas fa-microphone"></i>' : '<i class="fas fa-microphone-slash text-red-500"></i>';
 }
 
 function toggleCam() {
     camEnabled = !camEnabled;
-    if(localTracks[1]) localTracks[1].setEnabled(camEnabled);
-    
-    const camBtn = document.getElementById('btn-cam');
-    // කැමරාව ඕෆ් කළ විට අයිකනය රතු පාට වේ
-    camBtn.innerHTML = camEnabled ? 
-        '<i class="fas fa-camera text-white"></i>' : 
-        '<i class="fas fa-video-slash text-red-600"></i>';
-    
-    toast(camEnabled ? "Camera On" : "Camera Off");
+    localTracks[1].setEnabled(camEnabled);
+    document.getElementById('btn-cam').innerHTML = camEnabled ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash text-red-500"></i>';
 }
-   
+
 async function exitLive() {
     localTracks.forEach(t => { t.stop(); t.close(); });
     await client.leave();
@@ -508,15 +358,15 @@ async function sendGift(emoji, cost) {
         setTimeout(() => anim.remove(), 2500);
         
         toast(`Sent ${emoji} Gift!`);
-        // 482 පේළියට පල්ලෙහායින් මේක දාන්න
-        showGiftAnimation(emoji); 
         hideGiftPanel();
     } else { toast("Not enough coins!"); switchTab('wallet'); }
 }
 
-
+// PayPal Payment Logic
 function initPayPal(amount, coins) {
+    // කලින් තිබුණ බටන් එක ක්ලියර් කරනවා
     document.getElementById('paypal-button-container').innerHTML = ''; 
+    
     paypal.Buttons({
         createOrder: (data, actions) => {
             return actions.order.create({
@@ -526,21 +376,23 @@ function initPayPal(amount, coins) {
             });
         },
         onApprove: async (data, actions) => {
-            await actions.order.capture();
+            const order = await actions.order.capture();
             
-            // සල්ලි ගෙවුවට පස්සේ තෝරාගත් පැකේජ් එකේ කොයින්ස් ගාණ එකතු කිරීම
+            // ගෙවීම සාර්ථක නම් Firebase එකේ Coins Update කිරීම
             await db.collection('profiles').doc(currentUser.uid).update({
                 coins: firebase.firestore.FieldValue.increment(coins)
             });
             
-            toast(`Success! ${coins} Diamonds Added.`);
+            toast(`සාර්ථකයි! කොයින් ${coins} ක් එකතු වුණා. ✅`);
         },
         onError: (err) => {
-            toast("Payment Error!");
-            console.error(err);
+            toast("ගෙවීමේ දෝෂයක්! නැවත උත්සාහ කරන්න.");
+            console.error("PayPal Error:", err);
         }
     }).render('#paypal-button-container');
 }
+
+
 
 // --- UTILS ---
 function initUser() {
@@ -560,7 +412,7 @@ function claimDaily() {
         const now = Date.now();
         if (now - (doc.data().lastBonus || 0) > 86400000) {
             ref.update({ coins: firebase.firestore.FieldValue.increment(10), lastBonus: now });
-            toast("Daily 10 Coins Claimed! 🎁");
+            toast("Daily 10 Coins Claimed! ðŸŽ");
         } else toast("Come back tomorrow!");
     });
 }
@@ -575,7 +427,8 @@ function toast(m) {
 
 function showGiftPanel() { document.getElementById('gift-panel').classList.remove('hidden'); }
 function hideGiftPanel() { document.getElementById('gift-panel').classList.add('hidden'); }
-    // --- WITHDRAW SYSTEM FUNCTION ---
+
+// --- WITHDRAW SYSTEM FUNCTION ---
 async function requestWithdraw() {
     const amountInput = document.getElementById('withdraw-amount');
     const emailInput = document.getElementById('paypal-email');
@@ -584,10 +437,10 @@ async function requestWithdraw() {
     const email = emailInput.value;
 
     if (!amount || amount < 1000) {
-        return toast("අවම විත්ඩ්‍රෝ එක කොයින් 1000 කි!");
+        return toast("    1000 !");
     }
     if (!email.includes('@')) {
-        return toast("PayPal Email එක නිවැරදිව ඇතුළත් කරන්න!");
+        return toast("PayPal Email    !");
     }
 
     const userRef = db.collection('profiles').doc(currentUser.uid);
@@ -595,12 +448,12 @@ async function requestWithdraw() {
     const currentCoins = snap.data().coins || 0;
 
     if (currentCoins >= amount) {
-        // කොයින්ස් අඩු කිරීම
+        //   
         await userRef.update({ 
             coins: firebase.firestore.FieldValue.increment(-amount) 
         });
 
-        // රිකුවෙස්ට් එක සේව් කිරීම
+        //    
         await db.collection('withdrawals').add({
             uid: currentUser.uid,
             email: email,
@@ -609,36 +462,12 @@ async function requestWithdraw() {
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        toast("Withdrawal Request එක සාර්ථකයි! ✅");
+        toast("Withdrawal Request  ! ");
         amountInput.value = "";
         emailInput.value = "";
     } else {
-        toast("ප්‍රමාණවත් කොයින් නොමැත! ❌");
+        toast("  ! ");
     }
-}
-// --- 3. APPLE STYLE GIFT ANIMATION ---
-function showGiftAnimation(emoji) {
-    const area = document.getElementById('gift-display-area');
-    if(!area) return; 
-
-    const gift = document.createElement('div');
-    // iOS Blur effect එක සහ Bounce animation එක මෙතන තියෙනවා
-    gift.className = "bg-white/20 backdrop-blur-md border border-white/30 p-2 px-4 rounded-2xl text-2xl animate-bounce flex items-center gap-2 mb-2 self-start shadow-lg transition-all duration-500";
-    
-    gift.innerHTML = `
-        <span class="text-[10px] text-white/90 font-bold uppercase tracking-tighter">Gift</span>
-        <span>${emoji}</span>
-    `;
-
-    // අලුත් තෑග්ග උඩින්ම එකතු කරනවා
-    area.prepend(gift);
-
-    // තත්පර 4කින් මැකී යන ලෙස සැකසීම
-    setTimeout(() => {
-        gift.style.opacity = '0';
-        gift.style.transform = 'translateY(-20px)';
-        setTimeout(() => gift.remove(), 500);
-    }, 4000);
 }
 
 </script>
