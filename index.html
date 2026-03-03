@@ -480,6 +480,8 @@ async function sendGift(emoji, cost) {
         setTimeout(() => anim.remove(), 2500);
         
         toast(`Sent ${emoji} Gift!`);
+        // 482 පේළියට පල්ලෙහායින් මේක දාන්න
+        showGiftAnimation(emoji); 
         hideGiftPanel();
     } else { toast("Not enough coins!"); switchTab('wallet'); }
 }
@@ -585,6 +587,30 @@ async function requestWithdraw() {
     } else {
         toast("ප්‍රමාණවත් කොයින් නොමැත! ❌");
     }
+}
+// --- 3. APPLE STYLE GIFT ANIMATION ---
+function showGiftAnimation(emoji) {
+    const area = document.getElementById('gift-display-area');
+    if(!area) return; 
+
+    const gift = document.createElement('div');
+    // iOS Blur effect එක සහ Bounce animation එක මෙතන තියෙනවා
+    gift.className = "bg-white/20 backdrop-blur-md border border-white/30 p-2 px-4 rounded-2xl text-2xl animate-bounce flex items-center gap-2 mb-2 self-start shadow-lg transition-all duration-500";
+    
+    gift.innerHTML = `
+        <span class="text-[10px] text-white/90 font-bold uppercase tracking-tighter">Gift</span>
+        <span>${emoji}</span>
+    `;
+
+    // අලුත් තෑග්ග උඩින්ම එකතු කරනවා
+    area.prepend(gift);
+
+    // තත්පර 4කින් මැකී යන ලෙස සැකසීම
+    setTimeout(() => {
+        gift.style.opacity = '0';
+        gift.style.transform = 'translateY(-20px)';
+        setTimeout(() => gift.remove(), 500);
+    }, 4000);
 }
 
 </script>
