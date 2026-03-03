@@ -340,7 +340,8 @@ async function uploadPhoto(file) {
 async function startLive() {
     try {
         
-        currentHost = currentUser.uid;
+        // startLive එක ඇතුළේ අන්තිමට මේක දාන්න
+        updateLiveHostUI();
         document.getElementById('live-screen').classList.remove('hidden');
         document.getElementById('local-player').classList.remove('hidden');
         updateHostUI(currentUser.displayName, currentUser.photoURL);
