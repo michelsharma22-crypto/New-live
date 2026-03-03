@@ -275,7 +275,7 @@ async function startLive() {
         document.getElementById('live-screen').classList.remove('hidden');
         document.getElementById('local-player').classList.remove('hidden');
         
-        await client.join("d369ed90f2c04b59b9be680fbe3ca788", currentHost, null, currentHost);
+        await client.join("1dad2898a8364e9c94875beb9823d2b7", currentHost, null, currentHost);
         localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
         localTracks[1].play('local-player');
         await client.publish(localTracks);
