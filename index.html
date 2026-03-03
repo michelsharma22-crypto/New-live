@@ -427,18 +427,36 @@ async function startLive() {
     } catch (e) { toast("Stream Error: " + e.message); }
 }
 
+ // --- NEW MUTE & CAMERA CONTROLS ---
+let micEnabled = true;
+let camEnabled = true;
+
 function toggleMic() {
     micEnabled = !micEnabled;
-    localTracks[0].setEnabled(micEnabled);
-    document.getElementById('btn-mic').innerHTML = micEnabled ? '<i class="fas fa-microphone"></i>' : '<i class="fas fa-microphone-slash text-red-500"></i>';
+    if(localTracks[0]) localTracks[0].setEnabled(micEnabled);
+    
+    const micBtn = document.getElementById('btn-mic');
+    // මියුට් කළ විට අයිකනය රතු පාට වේ
+    micBtn.innerHTML = micEnabled ? 
+        '<i class="fas fa-microphone text-white"></i>' : 
+        '<i class="fas fa-microphone-slash text-red-600"></i>';
+    
+    toast(micEnabled ? "Mic On" : "Mic Muted");
 }
 
 function toggleCam() {
     camEnabled = !camEnabled;
-    localTracks[1].setEnabled(camEnabled);
-    document.getElementById('btn-cam').innerHTML = camEnabled ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash text-red-500"></i>';
+    if(localTracks[1]) localTracks[1].setEnabled(camEnabled);
+    
+    const camBtn = document.getElementById('btn-cam');
+    // කැමරාව ඕෆ් කළ විට අයිකනය රතු පාට වේ
+    camBtn.innerHTML = camEnabled ? 
+        '<i class="fas fa-camera text-white"></i>' : 
+        '<i class="fas fa-video-slash text-red-600"></i>';
+    
+    toast(camEnabled ? "Camera On" : "Camera Off");
 }
-
+   
 async function exitLive() {
     localTracks.forEach(t => { t.stop(); t.close(); });
     await client.leave();
