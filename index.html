@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YNS GALAXY LIVE PREMIUM - Ultra Build</title>
+    <title>GALAXY LIVE PREMIUM - Ultimate Build</title>
+    
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -11,319 +12,394 @@
     <script src="https://www.paypal.com/sdk/js?client-id=AUeKXlq5yfwabWD2bx7HF_F4-XmEGSTS2-iEeeqDdvXFqW7dODdkrf85ZXb9UIQl9oWFWR14Vh_V4kiM&currency=USD"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
+
     <style>
-        body { 
-            background: #050505; color: white; font-family: 'Segoe UI', sans-serif; overflow-x: hidden;
-            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://res.cloudinary.com/dbtf9fbl3/image/upload/v1772479879/grok_image_1772246958370_mrkeia.jpg');
-            background-size: cover; background-attachment: fixed;
-        }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .tab-active { color: #f472b6; border-bottom: 3px solid #f472b6; }
-        @keyframes gift-float { 0% { transform: translate(-50%, 0) scale(1); opacity: 1; } 100% { transform: translate(-50%, -400px) scale(3); opacity: 0; } }
-        .gift-anim { position: fixed; bottom: 30%; left: 50%; z-index: 1000; animation: gift-float 2.5s forwards; font-size: 80px; pointer-events: none; }
-        .notif-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #db2777; padding: 12px 30px; border-radius: 50px; z-index: 2000; font-weight: bold; box-shadow: 0 0 20px rgba(219,39,119,0.5); }
-        #remote-video { width: 100%; height: 100vh; object-fit: cover; }
-        .chat-msg { background: rgba(0,0,0,0.4); padding: 5px 12px; border-radius: 15px; margin-bottom: 5px; font-size: 13px; width: fit-content; }
+        body { background: #050505; color: white; font-family: sans-serif; overflow-x: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
+        .screen { min-height: 100vh; width: 100%; transition: 0.3s; }
+        .hidden { display: none !important; }
+        @keyframes gift-float { 0% { transform: translate(-50%, 0) scale(1); opacity: 1; } 100% { transform: translate(-50%, -250px) scale(2.5); opacity: 0; } }
+        .gift-anim { position: fixed; bottom: 40%; left: 50%; z-index: 1000; animation: gift-float 2.5s forwards; pointer-events: none; }
+        .live-pulse { animation: pulse 1.5s infinite; background: #ef4444; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
+        #remote-video { background: #111; position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
 
 <div id="toast-box"></div>
 
-<div id="auth-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center p-8 bg-black">
+<div id="auth-screen" class="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black p-8">
     <div class="text-center mb-10">
-        <h1 class="text-5xl font-black text-pink-500 italic">GALAXY</h1>
-        <p class="tracking-[0.5em] text-xs text-zinc-500">LIVE PREMIUM</p>
+        <h1 class="text-6xl font-black text-pink-500 italic">GALAXY</h1>
+        <p class="text-zinc-500 tracking-[0.2em] text-xs mt-2">LIVE STREAMING PREMIUM</p>
     </div>
     <div class="w-full max-w-sm space-y-4">
-        <input id="reg-name" type="text" placeholder="Full Name" class="w-full bg-zinc-900 p-4 rounded-2xl outline-none border border-white/5">
-        <input id="auth-email" type="email" placeholder="Email Address" class="w-full bg-zinc-900 p-4 rounded-2xl outline-none border border-white/5">
-        <input id="auth-pass" type="password" placeholder="Password" class="w-full bg-zinc-900 p-4 rounded-2xl outline-none border border-white/5">
-        <button onclick="handleAuth('register')" class="w-full bg-pink-600 py-4 rounded-2xl font-bold">Create Account</button>
-        <button onclick="handleAuth('login')" class="w-full border border-zinc-800 py-4 rounded-2xl font-bold text-zinc-400">Login</button>
+        <input id="reg-name" type="text" placeholder="Full Name" class="w-full bg-zinc-900 p-4 rounded-2xl outline-none focus:ring-2 ring-pink-500">
+        <input id="auth-email" type="email" placeholder="Email" class="w-full bg-zinc-900 p-4 rounded-2xl outline-none focus:ring-2 ring-pink-500">
+        <input id="auth-pass" type="password" placeholder="Password" class="w-full bg-zinc-900 p-4 rounded-2xl outline-none focus:ring-2 ring-pink-500">
+        <button onclick="handleAuth('register')" class="w-full bg-pink-600 py-4 rounded-2xl font-bold shadow-lg shadow-pink-900/20">Create Account</button>
+        <button onclick="handleAuth('login')" class="w-full text-zinc-400 py-2">Already have an account? Login</button>
     </div>
 </div>
 
- <div id="app-screen" class="screen pb-24">
+<div id="app-screen" class="hidden pb-24">
     <header class="p-6 flex justify-between items-center sticky top-0 z-50 glass">
         <div class="flex items-center gap-3">
-            <img id="my-avatar" src="https://via.placeholder.com/150" class="w-10 h-10 rounded-full border-2 border-pink-500 object-cover">
+            <div class="relative">
+                <img id="my-avatar" src="https://via.placeholder.com/150" class="w-12 h-12 rounded-full border-2 border-pink-500 object-cover">
+                <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-black"></div>
+            </div>
             <div>
-                <p id="my-name" class="font-bold text-sm">User</p>
-                <p class="text-[10px] text-pink-400 font-bold uppercase">Online</p>
+                <p id="my-name" class="font-bold text-sm">Loading...</p>
+                <div class="bg-yellow-500/10 px-2 py-0.5 rounded flex items-center gap-1">
+                    <span class="text-yellow-500 text-[10px] font-bold">💎 <span id="my-coins">0</span></span>
+                </div>
             </div>
         </div>
-        <div class="bg-black/50 px-4 py-2 rounded-full border border-pink-500/20">
-            <span class="text-yellow-400 font-bold text-sm">💎 <span id="my-coins">0</span></span>
-        </div>
+        <button onclick="showSection('wallet')" class="w-10 h-10 rounded-full glass flex items-center justify-center">
+            <i class="fas fa-plus text-pink-500"></i>
+        </button>
     </header>
 
-    <div id="home-screen" class="screen p-6">
-        <div class="relative">
-            <input type="text" id="user-search" oninput="searchUsers()" placeholder="Search users..." class="w-full bg-white/5 p-4 pl-12 rounded-2xl outline-none border border-white/10">
+    <div id="home-section" class="screen-content p-6">
+        <div class="relative mb-8">
+            <input type="text" id="user-search" oninput="searchUsers()" placeholder="Search members..." class="w-full bg-zinc-900 p-4 pl-12 rounded-2xl border border-white/5">
             <i class="fas fa-search absolute left-5 top-5 text-zinc-500"></i>
         </div>
-    </div>
 
-    <div class="px-6 space-y-6">
-        <div class="bg-gradient-to-r from-pink-900/40 to-black p-6 rounded-3xl border border-pink-500/20">
-            <h2 class="font-bold text-lg mb-4">Daily Reward</h2>
-            <button onclick="claimDaily()" class="bg-white text-black px-6 py-2 rounded-full font-bold text-xs">CLAIM 10 COINS</button>
+        <div class="bg-gradient-to-br from-pink-600 to-purple-700 p-6 rounded-[32px] mb-8 relative overflow-hidden">
+            <div class="relative z-10">
+                <h3 class="font-bold text-lg">Daily Bonus</h3>
+                <p class="text-white/70 text-xs mb-4">Get 10 free coins every 24h</p>
+                <button onclick="claimDaily()" class="bg-white text-black px-6 py-2 rounded-full font-bold text-sm">Claim Now</button>
+            </div>
+            <i class="fas fa-coins absolute -right-4 -bottom-4 text-8xl text-black/10"></i>
         </div>
 
-        <h3 class="text-xs font-bold text-zinc-500 uppercase tracking-widest">Members</h3>
+        <h3 class="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4 px-2">Live & Members</h3>
         <div id="user-grid" class="grid grid-cols-2 gap-4"></div>
     </div>
-  </div> 
 
-    <div id="live-screen" class="hidden fixed inset-0 z-[60] bg-black">
-        <div id="remote-video"></div>
-        <div class="absolute bottom-32 left-6 right-6 h-40 overflow-y-auto flex flex-col justify-end" id="chat-box"></div>
-        
-        <div class="absolute bottom-10 left-6 right-6 flex gap-3">
-            <input id="chat-input" type="text" placeholder="Say something..." class="flex-grow bg-black/50 p-4 rounded-2xl border border-white/20 outline-none text-sm">
-            <button onclick="sendChat()" class="bg-pink-600 w-14 h-14 rounded-2xl"><i class="fas fa-paper-plane"></i></button>
-            <button onclick="toggleGifts()" class="bg-yellow-500 w-14 h-14 rounded-2xl"><i class="fas fa-gift"></i></button>
-            <button onclick="leaveLive()" class="bg-red-600 w-14 h-14 rounded-2xl"><i class="fas fa-times"></i></button>
-        </div>
-    </div>
-
-    <div id="profile-edit" class="hidden fixed inset-0 z-[70] bg-black p-8 overflow-y-auto">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-bold">Edit Profile</h2>
-            <button onclick="closeEdit()"><i class="fas fa-times text-xl"></i></button>
+    <div id="wallet-section" class="screen-content hidden p-6">
+        <h2 class="text-3xl font-bold mb-6">Wallet</h2>
+        <div class="bg-zinc-900 p-8 rounded-[40px] text-center mb-8 border border-white/5">
+            <p class="text-zinc-500 text-sm mb-2">Total Balance</p>
+            <h1 class="text-5xl font-bold text-pink-500">💎 <span id="wallet-coins">0</span></h1>
         </div>
         
-        <div class="flex flex-col items-center mb-8">
-            <img id="edit-preview" src="https://via.placeholder.com/150" class="w-28 h-28 rounded-full border-4 border-pink-600 mb-4 object-cover">
-            <input type="file" id="file-input" class="hidden" onchange="uploadToCloudinary(this.files[0])">
-            <button onclick="document.getElementById('file-input').click()" class="text-pink-400 text-xs font-bold uppercase">Change Photo</button>
-        </div>
-
         <div class="space-y-4">
-            <input id="up-name" type="text" placeholder="Name" class="w-full bg-zinc-900 p-4 rounded-xl outline-none">
-            <textarea id="up-bio" placeholder="Bio" class="w-full bg-zinc-900 p-4 rounded-xl outline-none h-24"></textarea>
-            <select id="up-gender" class="w-full bg-zinc-900 p-4 rounded-xl outline-none">
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-            </select>
-            <input id="up-country" type="text" placeholder="Country" class="w-full bg-zinc-900 p-4 rounded-xl outline-none">
-            <button onclick="saveProfile()" class="w-full bg-pink-600 py-4 rounded-xl font-bold">Save Changes</button>
+            <div class="glass p-6 rounded-3xl flex justify-between items-center">
+                <div>
+                    <p class="font-bold text-lg">100 Coins</p>
+                    <p class="text-zinc-500 text-xs">Best for beginners</p>
+                </div>
+                <button onclick="initPayPal(2.50, 100)" class="bg-white text-black px-6 py-3 rounded-2xl font-bold">$2.50</button>
+            </div>
+            <div class="glass p-6 rounded-3xl flex justify-between items-center">
+                <div>
+                    <p class="font-bold text-lg">500 Coins</p>
+                    <p class="text-zinc-500 text-xs">Most Popular</p>
+                </div>
+                <button onclick="initPayPal(10.00, 500)" class="bg-pink-600 text-white px-6 py-3 rounded-2xl font-bold">$10.00</button>
+            </div>
+        </div>
+        <div id="paypal-container" class="mt-6"></div>
+    </div>
+
+    <div id="profile-section" class="screen-content hidden p-6">
+        <h2 class="text-3xl font-bold mb-6">Edit Profile</h2>
+        <div class="flex flex-col items-center mb-8">
+            <div class="relative">
+                <img id="edit-avatar-preview" src="https://via.placeholder.com/150" class="w-32 h-32 rounded-full border-4 border-pink-500 object-cover">
+                <label class="absolute bottom-0 right-0 bg-pink-600 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer border-4 border-black">
+                    <i class="fas fa-camera text-sm"></i>
+                    <input type="file" id="photo-input" class="hidden" onchange="uploadPhoto(this)">
+                </label>
+            </div>
+        </div>
+        <div class="space-y-4">
+            <input id="up-name" type="text" placeholder="Display Name" class="w-full bg-zinc-900 p-4 rounded-2xl outline-none border border-white/5">
+            <textarea id="up-bio" placeholder="Tell us about yourself..." class="w-full bg-zinc-900 p-4 rounded-2xl outline-none border border-white/5 h-24"></textarea>
+            <div class="grid grid-cols-2 gap-4">
+                <input id="up-age" type="number" placeholder="Age" class="bg-zinc-900 p-4 rounded-2xl outline-none border border-white/5">
+                <select id="up-gender" class="bg-zinc-900 p-4 rounded-2xl outline-none border border-white/5">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <input id="up-country" type="text" placeholder="Country" class="w-full bg-zinc-900 p-4 rounded-2xl outline-none border border-white/5">
+            <button onclick="updateProfile()" class="w-full bg-pink-600 py-4 rounded-2xl font-bold text-lg mt-4">Save Profile</button>
         </div>
     </div>
 
-    <nav class="fixed bottom-0 w-full glass h-20 flex justify-around items-center px-10 rounded-t-3xl z-50">
-        <button onclick="showSection('home')" class="text-xl tab-active"><i class="fas fa-home"></i></button>
-        <button onclick="startMyLive()" class="text-3xl text-pink-500"><i class="fas fa-circle-play"></i></button>
-        <button onclick="openEdit()" class="text-xl"><i class="fas fa-user-circle"></i></button>
-        <button onclick="showSection('wallet')" class="text-xl"><i class="fas fa-wallet"></i></button>
+    <nav class="fixed bottom-0 left-0 right-0 h-20 glass flex justify-around items-center px-6 z-50 rounded-t-[35px]">
+        <button onclick="showSection('home')" class="nav-btn text-2xl text-zinc-500"><i class="fas fa-grid-2"></i></button>
+        <button onclick="startLiveSession()" class="w-14 h-14 bg-pink-600 rounded-full flex items-center justify-center shadow-lg shadow-pink-600/30 -mt-8 border-4 border-black">
+            <i class="fas fa-video text-white"></i>
+        </button>
+        <button onclick="showSection('profile')" class="nav-btn text-2xl text-zinc-500"><i class="fas fa-user"></i></button>
     </nav>
 </div>
-</div> 
 
-<div id="gift-panel" class="hidden fixed inset-0 z-[100] flex items-end">
-    <div class="w-full glass rounded-t-[40px] p-8 pb-12">
-        <div class="grid grid-cols-4 gap-4 mb-8">
-            <div onclick="sendGift('🌹', 1)" class="text-center p-2 bg-white/5 rounded-2xl">🌹 <p class="text-[10px] mt-1">1</p></div>
-            <div onclick="sendGift('💋', 5)" class="text-center p-2 bg-white/5 rounded-2xl">💋 <p class="text-[10px] mt-1">5</p></div>
-            <div onclick="sendGift('🎈', 10)" class="text-center p-2 bg-white/5 rounded-2xl">🎈 <p class="text-[10px] mt-1">10</p></div>
-            <div onclick="sendGift('💍', 50)" class="text-center p-2 bg-white/5 rounded-2xl">💍 <p class="text-[10px] mt-1">50</p></div>
-            <div onclick="sendGift('👑', 100)" class="text-center p-2 bg-white/5 rounded-2xl">👑 <p class="text-[10px] mt-1">100</p></div>
-            <div onclick="sendGift('🚗', 500)" class="text-center p-2 bg-white/5 rounded-2xl">🚗 <p class="text-[10px] mt-1">500</p></div>
-            <div onclick="sendGift('🚁', 1000)" class="text-center p-2 bg-white/5 rounded-2xl">🚁 <p class="text-[10px] mt-1">1k</p></div>
-            <div onclick="sendGift('🦁', 5000)" class="text-center p-2 bg-white/5 rounded-2xl">🦁 <p class="text-[10px] mt-1">5k</p></div>
-            <div onclick="sendGift('🚀', 10000)" class="text-center p-2 bg-white/5 rounded-2xl">🚀 <p class="text-[10px] mt-1">10k</p></div>
-            <div onclick="sendGift('🏰', 25000)" class="text-center p-2 bg-white/5 rounded-2xl">🏰 <p class="text-[10px] mt-1">25k</p></div>
-            <div onclick="sendGift('🦄', 50000)" class="text-center p-2 bg-white/5 rounded-2xl">🦄 <p class="text-[10px] mt-1">50k</p></div>
-            <div onclick="sendGift('🌌', 99999)" class="text-center p-2 bg-white/5 rounded-2xl">🌌 <p class="text-[10px] mt-1">100k</p></div>
+<div id="live-screen" class="hidden fixed inset-0 z-[100] bg-black">
+    <div id="remote-video"></div>
+    
+    <div class="absolute top-10 left-6 right-6 flex justify-between items-center z-10">
+        <div class="flex items-center gap-3 glass p-1 rounded-full pr-4">
+            <img id="host-img" class="w-10 h-10 rounded-full border-2 border-pink-500">
+            <div>
+                <p id="host-name" class="text-xs font-bold">Host Name</p>
+                <div class="flex items-center gap-1">
+                    <div class="w-1.5 h-1.5 bg-red-500 rounded-full live-pulse"></div>
+                    <span class="text-[9px] font-bold uppercase tracking-tighter">Live</span>
+                </div>
+            </div>
         </div>
-        <button onclick="toggleGifts()" class="w-full text-zinc-500 font-bold uppercase text-xs">Cancel</button>
+        <button onclick="endLive()" class="w-10 h-10 glass rounded-full flex items-center justify-center text-white">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <div id="chat-box" class="absolute bottom-32 left-6 right-20 h-48 overflow-y-auto flex flex-col justify-end space-y-2 pointer-events-none"></div>
+
+    <div class="absolute bottom-10 left-6 right-6 flex gap-3">
+        <input id="chat-input" type="text" placeholder="Send a message..." class="flex-grow glass p-4 rounded-2xl outline-none text-sm border border-white/10">
+        <button onclick="sendChatMessage()" class="w-14 h-14 glass rounded-2xl flex items-center justify-center text-pink-500">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+        <button onclick="openGiftPanel()" class="w-14 h-14 bg-yellow-500 rounded-2xl flex items-center justify-center text-black">
+            <i class="fas fa-gift"></i>
+        </button>
+    </div>
+</div>
+
+<div id="gift-panel" class="hidden fixed inset-0 z-[110] flex items-end">
+    <div class="absolute inset-0 bg-black/60" onclick="closeGiftPanel()"></div>
+    <div class="w-full glass rounded-t-[45px] p-8 relative z-20 border-t border-white/10">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-bold">Send a Gift</h3>
+            <p class="text-yellow-500 font-bold">💎 <span id="gift-coins-display">0</span></p>
+        </div>
+        <div class="grid grid-cols-4 gap-4 max-h-72 overflow-y-auto pb-6">
+            <div onclick="processGift('🌹', 1)" class="flex flex-col items-center p-3 glass rounded-2xl">
+                <span class="text-2xl mb-1">🌹</span><span class="text-[10px] font-bold">1</span>
+            </div>
+            <div onclick="processGift('💋', 5)" class="flex flex-col items-center p-3 glass rounded-2xl">
+                <span class="text-2xl mb-1">💋</span><span class="text-[10px] font-bold">5</span>
+            </div>
+            <div onclick="processGift('🎈', 10)" class="flex flex-col items-center p-3 glass rounded-2xl">
+                <span class="text-2xl mb-1">🎈</span><span class="text-[10px] font-bold">10</span>
+            </div>
+            <div onclick="processGift('💍', 50)" class="flex flex-col items-center p-3 glass rounded-2xl">
+                <span class="text-2xl mb-1">💍</span><span class="text-[10px] font-bold">50</span>
+            </div>
+            <div onclick="processGift('👑', 100)" class="flex flex-col items-center p-3 glass rounded-2xl">
+                <span class="text-2xl mb-1">👑</span><span class="text-[10px] font-bold">100</span>
+            </div>
+            <div onclick="processGift('🚗', 500)" class="flex flex-col items-center p-3 glass rounded-2xl">
+                <span class="text-2xl mb-1">🚗</span><span class="text-[10px] font-bold">500</span>
+            </div>
+            <div onclick="processGift('🚁', 1000)" class="flex flex-col items-center p-3 glass rounded-2xl">
+                <span class="text-2xl mb-1">🚁</span><span class="text-[10px] font-bold">1000</span>
+            </div>
+            <div onclick="processGift('🦁', 2000)" class="flex flex-col items-center p-3 glass rounded-2xl">
+                <span class="text-2xl mb-1">🦁</span><span class="text-[10px] font-bold">2000</span>
+            </div>
+            <div onclick="processGift('🚀', 5000)" class="flex flex-col items-center p-3 glass rounded-2xl">
+                <span class="text-2xl mb-1">🚀</span><span class="text-[10px] font-bold">5000</span>
+            </div>
+            <div onclick="processGift('🏰', 10000)" class="flex flex-col items-center p-3 glass rounded-2xl">
+                <span class="text-2xl mb-1">🏰</span><span class="text-[10px] font-bold">10000</span>
+            </div>
+            <div onclick="processGift('🦄', 15000)" class="flex flex-col items-center p-3 glass rounded-2xl">
+                <span class="text-2xl mb-1">🦄</span><span class="text-[10px] font-bold">15000</span>
+            </div>
+            <div onclick="processGift('🌌', 50000)" class="flex flex-col items-center p-3 glass rounded-2xl">
+                <span class="text-2xl mb-1">🌌</span><span class="text-[10px] font-bold">50000</span>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-    const firebaseConfig = { apiKey: "AIzaSyBwDUe5E8qRY1dbZzUQJu9eCAKBS7YSHVU", authDomain: "live-e6771.firebaseapp.com", projectId: "live-e6771", storageBucket: "live-e6771.firebasestorage.app", messagingSenderId: "570901004231", appId: "1:570901004231:web:220679cf41cf55b98023e2" };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth(), db = firebase.firestore(), client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
-    
-    // Cloudinary Config
-    const CLOUD_NAME = "dbtf9fbl3";
-    const UPLOAD_PRESET = "my_profile_preset";
+// --- CONFIGS ---
+const firebaseConfig = { apiKey: "AIzaSyBwDUe5E8qRY1dbZzUQJu9eCAKBS7YSHVU", authDomain: "live-e6771.firebaseapp.com", projectId: "live-e6771", storageBucket: "live-e6771.firebasestorage.app", messagingSenderId: "570901004231", appId: "1:570901004231:web:220679cf41cf55b98023e2" };
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth(), db = firebase.firestore();
+const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 
-    let currentUser = null, localTracks = [], currentHost = null, allUsers = [];
+const CLOUD_NAME = "dbtf9fbl3", UPLOAD_PRESET = "my_profile_preset";
+let currentUser = null, localTracks = [], currentHostId = null;
 
-    auth.onAuthStateChanged(user => {
-        if(user) { currentUser = user; document.getElementById('auth-screen').classList.add('hidden'); document.getElementById('app-screen').classList.remove('hidden'); syncData(); }
-        else { document.getElementById('auth-screen').classList.remove('hidden'); }
-    });
-
-    // 1. & 2. AUTH & BONUS
-    async function handleAuth(type) {
-        const e = document.getElementById('auth-email').value, p = document.getElementById('auth-pass').value, n = document.getElementById('reg-name').value;
-        try {
-            if(type === 'register') {
-                const res = await auth.createUserWithEmailAndPassword(e, p);
-                await db.collection('profiles').doc(res.user.uid).set({ displayName: n, coins: 50, isLive: false, lastBonus: 0, photoUrl: '' });
-            } else { await auth.signInWithEmailAndPassword(e, p); }
-        } catch(err) { alert(err.message); }
+// --- AUTH (Feature 1, 2) ---
+auth.onAuthStateChanged(user => {
+    if (user) {
+        currentUser = user;
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.remove('hidden');
+        syncProfile();
+        loadUsers();
+    } else {
+        document.getElementById('auth-screen').classList.remove('hidden');
     }
+});
 
-    function syncData() {
-        db.collection('profiles').doc(currentUser.uid).onSnapshot(doc => {
-            const d = doc.data();
-            document.getElementById('my-coins').innerText = d.coins;
-            document.getElementById('my-name').innerText = d.displayName;
-            if(d.photoUrl) { document.getElementById('my-avatar').src = d.photoUrl; document.getElementById('edit-preview').src = d.photoUrl; }
-        });
-        db.collection('profiles').onSnapshot(snap => {
-            allUsers = []; snap.forEach(doc => { if(doc.id !== currentUser.uid) allUsers.push({id: doc.id, ...doc.data()}); });
-            renderUsers(allUsers);
-        });
-    }
+async function handleAuth(type) {
+    const email = document.getElementById('auth-email').value;
+    const pass = document.getElementById('auth-pass').value;
+    const name = document.getElementById('reg-name').value;
 
-    function renderUsers(users) {
-        const grid = document.getElementById('user-grid'); grid.innerHTML = "";
-        users.forEach(u => {
-            grid.innerHTML += `
-                <div onclick="smartClick('${u.id}')" class="relative glass p-4 rounded-[30px] text-center border border-white/5 active:scale-95 transition">
-                    ${u.isLive ? '<span class="absolute top-4 right-4 bg-red-600 text-[8px] font-black px-2 py-0.5 rounded-full animate-pulse">LIVE</span>' : ''}
-                    <img src="${u.photoUrl || 'https://via.placeholder.com/150'}" class="w-16 h-16 rounded-full mx-auto mb-3 object-cover border-2 border-white/10">
-                    <p class="text-xs font-bold truncate">${u.displayName}</p>
-                </div>`;
-        });
-    }
-
-    // 3. SMART CLICK
-    async function smartClick(uid) {
-        const doc = await db.collection('profiles').doc(uid).get();
-        if(doc.data().isLive) joinLive(uid);
-        else showProfile(uid);
-    }
-
-    // 13. CLOUDINARY UPLOAD
-    async function uploadToCloudinary(file) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', UPLOAD_PRESET);
-        toast("Uploading photo...");
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: 'POST', body: formData });
-        const data = await res.json();
-        await db.collection('profiles').doc(currentUser.uid).update({ photoUrl: data.secure_url });
-        toast("Profile photo updated!");
-    }
-
-    // 6. AGORA LIVE
-    async function startMyLive() {
-        await client.join("d369ed90f2c04b599b9e680fbe3ca788", currentUser.uid, null, 0);
-        localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-        document.getElementById('live-screen').classList.remove('hidden');
-        localTracks[1].play('remote-video');
-        await client.publish(localTracks);
-        await db.collection('profiles').doc(currentUser.uid).update({ isLive: true });
-        currentHost = currentUser.uid;
-    }
-
-    async function joinLive(hostId) {
-        currentHost = hostId;
-        await client.join("d369ed90f2c04b599b9e680fbe3ca788", hostId, null, 0);
-        document.getElementById('live-screen').classList.remove('hidden');
-        client.on("user-published", async (u, type) => {
-            await client.subscribe(u, type);
-            if(type === 'video') u.videoTrack.play('remote-video');
-            if(type === 'audio') u.audioTrack.play();
-        });
-        listenChat(hostId);
-    }
-
-    async function leaveLive() {
-        if(localTracks.length > 0) { localTracks.forEach(t => { t.stop(); t.close(); }); }
-        await client.leave();
-        await db.collection('profiles').doc(currentUser.uid).update({ isLive: false });
-        location.reload();
-    }
-
-    // 14. HOST REVENUE & 5. GIFTS
-    async function sendGift(emoji, cost) {
-        const meRef = db.collection('profiles').doc(currentUser.uid);
-        const hostRef = db.collection('profiles').doc(currentHost);
-        const meDoc = await meRef.get();
-        if(meDoc.data().coins >= cost) {
-            await meRef.update({ coins: firebase.firestore.FieldValue.increment(-cost) });
-            await hostRef.update({ coins: firebase.firestore.FieldValue.increment(cost) });
-            // Animation
-            const a = document.createElement('div'); a.className = 'gift-anim'; a.innerText = emoji;
-            document.body.appendChild(a); setTimeout(() => a.remove(), 2500);
-            toggleGifts();
-            toast(`Sent ${emoji} gift!`);
-        } else { toast("Not enough coins!"); }
-    }
-
-    // UTILS
-    function toast(m) {
-        const t = document.createElement('div'); t.className = 'notif-toast'; t.innerText = m;
-        document.getElementById('toast-box').appendChild(t); setTimeout(() => t.remove(), 3000);
-    }
-    
-   function showSection(id) {
-    // 1. මුලින්ම 'screen' class එක තියෙන හැම එකක්ම (home, wallet, app) හංගනවා
-    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-
-    // 2. Navbar එක තියෙන 'app-screen' එක හැමතිස්සෙම පෙන්වන්න ඕනේ
-    const app = document.getElementById('app-screen');
-    if (app) app.classList.remove('hidden');
-
-    // 3. දැන් අපිට ඕන කරන එක (home-screen හෝ wallet-screen) විතරක් පෙන්වනවා
-    const target = document.getElementById(id + '-screen');
-    if (target) {
-        target.classList.remove('hidden');
-    }
-
-}
-
-    function toggleGifts() { document.getElementById('gift-panel').classList.toggle('hidden'); }
-    function openEdit() { document.getElementById('profile-edit').classList.remove('hidden'); }
-    function closeEdit() { document.getElementById('profile-edit').classList.add('hidden'); }
-    function searchUsers() {
-        const term = document.getElementById('user-search').value.toLowerCase();
-        renderUsers(allUsers.filter(u => u.displayName.toLowerCase().includes(term)));
-    }
-    async function claimDaily() {
-        const ref = db.collection('profiles').doc(currentUser.uid);
-        const d = await ref.get();
-        if(Date.now() - (d.data().lastBonus || 0) > 86400000) {
-            await ref.update({ coins: firebase.firestore.FieldValue.increment(10), lastBonus: Date.now() });
-            toast("Claimed 10 coins!");
-        } else toast("Come back tomorrow!");
-    }
-    function pay(amount, coins) {
-    // කලින් තිබ්බ PayPal බටන් එක අයින් කරලා අලුත් එකක් හදනවා
-    document.getElementById('paypal-button-container').innerHTML = ''; 
-    
-    paypal.Buttons({
-        createOrder: (data, actions) => {
-            return actions.order.create({
-                purchase_units: [{ amount: { value: amount.toString() } }]
+    try {
+        if (type === 'register') {
+            const res = await auth.createUserWithEmailAndPassword(email, pass);
+            await db.collection('profiles').doc(res.user.uid).set({
+                uid: res.user.uid, displayName: name, coins: 50, // Feature 2: 50 Bonus
+                bio: "Available", islive: false, photoURL: "https://via.placeholder.com/150",
+                age: 18, country: "SL", gender: "Male", lastBonus: 0
             });
-        },
-        onApprove: (data, actions) => {
-            return actions.order.capture().then(details => {
-                // සල්ලි ගෙව්වට පස්සේ Wallet එකට කොයින් එකතු කරනවා
-                const currentCoins = parseInt(document.getElementById('my-coins').innerText) || 0;
-                const newTotal = currentCoins + coins;
-                
-                db.collection('profiles').doc(currentUser.uid).update({ 
-                    coins: newTotal 
-                }).then(() => {
-                    toast("Success! " + coins + " coins added.");
-                    showSection('home');
-                });
-            });
+            toast("Welcome! 50 Bonus Coins added.");
+        } else {
+            await auth.signInWithEmailAndPassword(email, pass);
         }
-    }).render('#paypal-button-container');
+    } catch (e) { toast(e.message); }
 }
 
+// --- NAVIGATION ---
+function showSection(id) {
+    document.querySelectorAll('.screen-content').forEach(s => s.classList.add('hidden'));
+    document.getElementById(id + '-section').classList.remove('hidden');
+    document.getElementById('paypal-container').innerHTML = ''; // Reset PayPal
+}
+
+// --- PHOTO UPLOAD (Feature 15) ---
+async function uploadPhoto(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    toast("Uploading photo...");
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
+    const data = await res.json();
+    
+    await db.collection('profiles').doc(currentUser.uid).update({ photoURL: data.secure_url });
+    document.getElementById('edit-avatar-preview').src = data.secure_url;
+    toast("Photo Updated!");
+}
+
+// --- SMART CLICK (Feature 3, 7, 18) ---
+async function loadUsers() {
+    db.collection('profiles').onSnapshot(snap => {
+        const grid = document.getElementById('user-grid');
+        grid.innerHTML = '';
+        snap.forEach(doc => {
+            const u = doc.data();
+            grid.innerHTML += `
+                <div onclick="userClick('${u.uid}')" class="glass rounded-[32px] overflow-hidden relative group">
+                    <img src="${u.photoURL}" class="w-full h-44 object-cover">
+                    ${u.islive ? '<div class="absolute top-3 left-3 bg-red-600 px-3 py-1 rounded-full text-[8px] font-bold live-pulse">LIVE</div>' : ''}
+                    <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
+                        <p class="font-bold text-xs truncate">${u.displayName}</p>
+                        <p class="text-[9px] text-zinc-400">${u.country}</p>
+                    </div>
+                </div>
+            `;
+        });
+    });
+}
+
+async function userClick(uid) {
+    if (uid === currentUser.uid) return showSection('profile');
+    const doc = await db.collection('profiles').doc(uid).get();
+    const u = doc.data();
+    if (u.islive) joinLive(uid); else toast(`${u.displayName}: ${u.bio}`);
+}
+
+// --- PAYPAL (Feature 16) ---
+function initPayPal(amount, coins) {
+    document.getElementById('paypal-container').innerHTML = '';
+    paypal.Buttons({
+        createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: amount } }] }),
+        onApprove: async (data, actions) => {
+            await actions.order.capture();
+            await db.collection('profiles').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(coins) });
+            toast(`Success! ${coins} coins added.`);
+            showSection('home');
+        }
+    }).render('#paypal-container');
+}
+
+// --- GIFTS & REVENUE (Feature 4, 5, 13) ---
+async function processGift(emoji, cost) {
+    const myRef = db.collection('profiles').doc(currentUser.uid);
+    const hostRef = db.collection('profiles').doc(currentHostId);
+    
+    const snap = await myRef.get();
+    if (snap.data().coins >= cost) {
+        await myRef.update({ coins: firebase.firestore.FieldValue.increment(-cost) });
+        await hostRef.update({ coins: firebase.firestore.FieldValue.increment(cost) }); // Feature 13
+        
+        // Feature 5 Animation
+        const anim = document.createElement('div');
+        anim.className = 'gift-anim text-7xl';
+        anim.innerText = emoji;
+        document.body.appendChild(anim);
+        setTimeout(() => anim.remove(), 2500);
+        
+        db.collection('chats').add({ hostId: currentHostId, msg: `Sent ${emoji}`, sender: snap.data().displayName, time: Date.now() });
+        closeGiftPanel();
+    } else { toast("Not enough coins!"); showSection('wallet'); closeGiftPanel(); }
+}
+
+// --- DAILY BONUS (Feature 8) ---
+async function claimDaily() {
+    const ref = db.collection('profiles').doc(currentUser.uid);
+    const doc = await ref.get();
+    const now = Date.now();
+    if (now - (doc.data().lastBonus || 0) > 86400000) {
+        await ref.update({ coins: firebase.firestore.FieldValue.increment(10), lastBonus: now });
+        toast("10 Daily Coins Added!");
+    } else toast("Try again tomorrow!");
+}
+
+// --- LIVE LOGIC (Feature 6, 17) ---
+async function startLiveSession() {
+    currentHostId = currentUser.uid;
+    document.getElementById('live-screen').classList.remove('hidden');
+    await db.collection('profiles').doc(currentUser.uid).update({ islive: true });
+    // Agora logic here...
+}
+
+function endLive() {
+    db.collection('profiles').doc(currentUser.uid).update({ islive: false });
+    location.reload(); // Feature 17 Fix
+}
+
+// --- UTILS ---
+function toast(m) {
+    const t = document.createElement('div');
+    t.className = 'fixed top-12 left-1/2 -translate-x-1/2 bg-pink-600 px-6 py-3 rounded-full font-bold z-[300] shadow-xl text-sm';
+    t.innerText = m;
+    document.getElementById('toast-box').appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
+
+function syncProfile() {
+    db.collection('profiles').doc(currentUser.uid).onSnapshot(doc => {
+        const d = doc.data();
+        document.getElementById('my-coins').innerText = d.coins;
+        document.getElementById('my-name').innerText = d.displayName;
+        document.getElementById('my-avatar').src = d.photoURL;
+        document.getElementById('gift-coins-display').innerText = d.coins;
+    });
+}
+
+function openGiftPanel() { document.getElementById('gift-panel').classList.remove('hidden'); }
+function closeGiftPanel() { document.getElementById('gift-panel').classList.add('hidden'); }
 </script>
 </body>
 </html>
