@@ -39,9 +39,7 @@
         
         <input id="auth-email" type="email" placeholder="Email Address" class="w-full bg-gray-100 p-4 rounded-2xl border border-gray-200 outline-none text-black">
         <input id="auth-pass" type="password" placeholder="Password" class="w-full bg-gray-100 p-4 rounded-2xl border border-gray-200 outline-none text-black">
-        
-        <button id="auth-main-btn" onclick="performAuth()" class="w-full bg-red-600 py-4 rounded-2xl text-white font-bold shadow-lg shadow-red-200 active:scale-95 transition">GET STARTED</button>
-        
+        <button onclick="toggleAuth()" class="w-full text-zinc-500 py-2 font-medium text-sm">Already have an account? <span class="text-red-600 font-bold">Login</span></button>
         <p class="text-center text-zinc-500 text-sm">
             <span id="auth-msg">Already have an account?</span> 
             <span id="auth-toggle-btn" onclick="toggleAuth()" class="text-red-600 font-bold cursor-pointer">Login</span>
