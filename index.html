@@ -263,9 +263,23 @@
         const t = document.createElement('div'); t.className = 'notif-toast'; t.innerText = m;
         document.getElementById('toast-box').appendChild(t); setTimeout(() => t.remove(), 3000);
     }
+    
     function showSection(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-    document.getElementById(id + '-screen').classList.remove('hidden');
+    // 1. මුලින්ම හැම ස්ක්‍රීන් එකක්ම හංගන්න
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach(s => s.classList.add('hidden'));
+
+    // 2. ප්‍රධාන ඇප් එක පෙන්වන්න (මේක හැමතිස්සෙම පේන්න ඕනේ)
+    const app = document.getElementById('app-screen');
+    if(app) app.classList.remove('hidden');
+
+    // 3. දැන් අපිට අවශ්‍ය පිටුව (Home හෝ Wallet) විතරක් පෙන්වන්න
+    const target = document.getElementById(id + '-screen');
+    if(target) {
+        target.classList.remove('hidden');
+    }
+
+
 }
 
     function toggleGifts() { document.getElementById('gift-panel').classList.toggle('hidden'); }
