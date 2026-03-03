@@ -155,32 +155,31 @@
 </div>
 
 <div id="live-screen" class="hidden fixed inset-0 z-[2000] bg-black">
-
+  <div class="absolute top-10 left-4 flex flex-col gap-3 z-[4000] pointer-events-none">
     
-    <div class="absolute top-10 left-4 right-4 flex justify-between items-start z-[4000] pointer-events-none">
-      <div class="flex items-center gap-2 bg-black/30 backdrop-blur-md p-1 pr-3 rounded-full border border-white/10 pointer-events-auto">
-        <img id="live-host-img" src="https://via.placeholder.com/40" class="w-9 h-9 rounded-full border-2 border-red-600 object-cover">
+    <div class="flex items-center gap-2 bg-black/30 backdrop-blur-md p-1 pr-3 rounded-full border border-white/10 pointer-events-auto w-fit">
+        <img id="live-host-img" src="https://via.placeholder.com/40" class="w-8 h-8 rounded-full border-2 border-red-600 object-cover">
         <div class="flex flex-col">
-            <span id="live-host-name" class="text-white text-[11px] font-bold leading-tight">Loading...</span>
-            <span class="text-red-500 text-[9px] font-black uppercase tracking-tighter">🔴 LIVE</span>
+            <span id="live-host-name" class="text-white text-[10px] font-bold leading-tight">Loading...</span>
+            <span class="text-red-500 text-[8px] font-black uppercase tracking-tighter">🔴 LIVE</span>
         </div>
-        <button onclick="followHost()" class="ml-2 bg-red-600 text-white text-[10px] font-extrabold px-3 py-1 rounded-full active:scale-95 transition">FOLLOW</button>
+        <button onclick="followHost()" class="ml-2 bg-red-600 text-white text-[9px] font-extrabold px-2 py-1 rounded-full active:scale-95">FOLLOW</button>
     </div>
 
-    <div class="flex items-center gap-2 pointer-events-auto">
-        <div class="bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
-            <span class="text-white text-[11px] font-bold">👤 <span id="live-viewers">0</span></span>
-        </div>
-        
-        <div class="bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
-            <span class="text-yellow-400 text-[11px] font-bold">💎 <span id="live-gifts-total" class="text-white">0</span></span>
-        </div>
-
-        <button onclick="shareLive()" class="w-9 h-9 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/10 active:scale-95">
-            <i class="fas fa-share-alt text-sm"></i>
-        </button>
+    <div class="bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-2 w-fit pointer-events-auto">
+        <span class="text-white text-[11px] font-bold">👤 <span id="live-viewers">0</span></span>
     </div>
+
+    <div class="bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-2 w-fit pointer-events-auto">
+        <span class="text-yellow-400 text-[11px] font-bold">💎 <span id="live-gifts-total" class="text-white">0</span></span>
+    </div>
+
+    <button onclick="shareLive()" class="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/10 active:scale-95 pointer-events-auto shadow-lg">
+        <i class="fas fa-share-alt text-sm"></i>
+    </button>
+
 </div>
+ 
 
     <div id="remote-player"></div>
     <div id="local-player"></div>
