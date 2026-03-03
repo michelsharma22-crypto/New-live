@@ -327,6 +327,33 @@
             toast("Claimed 10 coins!");
         } else toast("Come back tomorrow!");
     }
+    function pay(amount, coins) {
+    // කලින් තිබ්බ PayPal බටන් එක අයින් කරලා අලුත් එකක් හදනවා
+    document.getElementById('paypal-button-container').innerHTML = ''; 
+    
+    paypal.Buttons({
+        createOrder: (data, actions) => {
+            return actions.order.create({
+                purchase_units: [{ amount: { value: amount.toString() } }]
+            });
+        },
+        onApprove: (data, actions) => {
+            return actions.order.capture().then(details => {
+                // සල්ලි ගෙව්වට පස්සේ Wallet එකට කොයින් එකතු කරනවා
+                const currentCoins = parseInt(document.getElementById('my-coins').innerText) || 0;
+                const newTotal = currentCoins + coins;
+                
+                db.collection('profiles').doc(currentUser.uid).update({ 
+                    coins: newTotal 
+                }).then(() => {
+                    toast("Success! " + coins + " coins added.");
+                    showSection('home');
+                });
+            });
+        }
+    }).render('#paypal-button-container');
+}
+
 </script>
 </body>
 </html>
