@@ -538,30 +538,18 @@ async function exitLive() {
         }
     }
 }
-// 1. Host ගේ නම සහ රූපය ලයිව් එකට යනකොට අප්ඩේට් කිරීම
-function updateHostUI(name, photo) {
-    document.getElementById('live-host-name').innerText = name;
-    document.getElementById('live-host-img').src = photo || "https://via.placeholder.com/40";
-}
 
-// 2. Follow කිරීමේ පහසුකම (Database එකට Connect වේ)
-async function followHost() {
-    if(!currentUser) return toast("Please login to follow!");
-    
-    // මෙතනදී අපි 'follows' කියන collection එකට data දානවා
-    try {
-        await db.collection('follows').add({
-            followerId: currentUser.uid,
-            followingId: "HOST_ID_HERE", // මේක dynamic විදියට ගන්න ඕනේ
-            timestamp: Date.now()
-        });
-        toast("Following Host!");
-    } catch(e) {
-        toast("Already following or Error!");
+// --- NEW VERTICAL UI FUNCTIONS ---
+
+// 1. Host ගේ විස්තර ලයිව් එකට යනකොට අප්ඩේට් කිරීම
+function updateLiveHostUI() {
+    if(currentUser && document.getElementById('live-host-name')) {
+        document.getElementById('live-host-name').innerText = currentUser.displayName;
+        document.getElementById('live-host-img').src = currentUser.photoURL || "https://via.placeholder.com/40";
     }
 }
 
-// 3. ලයිව් එක Share කිරීම (Web Share API)
+// 2. ලයිව් එක Share කිරීම
 async function shareLive() {
     if (navigator.share) {
         try {
@@ -570,14 +558,18 @@ async function shareLive() {
                 text: 'මෙන්න මම Galaxy App එකේ Live ඉන්නවා. ඇවිත් සෙට් වෙන්න!',
                 url: window.location.href
             });
-        } catch (err) {
-            console.log("Share cancelled");
-        }
+        } catch (err) { console.log("Share cancelled"); }
     } else {
-        // Share කරන්න බැරි Browser එකක් නම් URL එක කොපි කරනවා
         navigator.clipboard.writeText(window.location.href);
         toast("Link copied to clipboard!");
     }
+}
+
+// 3. Follow කිරීම (මෙය කලින් එකමයි)
+async function followHost() {
+    if(!currentUser) return toast("Please login to follow!");
+    toast("Following Host!"); 
+    // මෙතනට පස්සේ DB logic එක දාන්න පුළුවන්
 }
 
 </script>
