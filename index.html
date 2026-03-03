@@ -386,6 +386,48 @@ function toast(m) {
 
 function showGiftPanel() { document.getElementById('gift-panel').classList.remove('hidden'); }
 function hideGiftPanel() { document.getElementById('gift-panel').classList.add('hidden'); }
+    // --- WITHDRAW SYSTEM FUNCTION ---
+async function requestWithdraw() {
+    const amountInput = document.getElementById('withdraw-amount');
+    const emailInput = document.getElementById('paypal-email');
+    
+    const amount = parseInt(amountInput.value);
+    const email = emailInput.value;
+
+    if (!amount || amount < 1000) {
+        return toast("අවම විත්ඩ්‍රෝ එක කොයින් 1000 කි!");
+    }
+    if (!email.includes('@')) {
+        return toast("PayPal Email එක නිවැරදිව ඇතුළත් කරන්න!");
+    }
+
+    const userRef = db.collection('profiles').doc(currentUser.uid);
+    const snap = await userRef.get();
+    const currentCoins = snap.data().coins || 0;
+
+    if (currentCoins >= amount) {
+        // කොයින්ස් අඩු කිරීම
+        await userRef.update({ 
+            coins: firebase.firestore.FieldValue.increment(-amount) 
+        });
+
+        // රිකුවෙස්ට් එක සේව් කිරීම
+        await db.collection('withdrawals').add({
+            uid: currentUser.uid,
+            email: email,
+            amount: amount,
+            status: 'pending',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        toast("Withdrawal Request එක සාර්ථකයි! ✅");
+        amountInput.value = "";
+        emailInput.value = "";
+    } else {
+        toast("ප්‍රමාණවත් කොයින් නොමැත! ❌");
+    }
+}
+
 </script>
 </body>
 </html>
