@@ -448,15 +448,30 @@ async function sendGift(emoji, cost) {
     } else { toast("Not enough coins!"); switchTab('wallet'); }
 }
 
-// --- PAYPAL (Feature 16) ---
+
 function initPayPal(amount, coins) {
-    document.getElementById('paypal-button-container').innerHTML = '';
+    document.getElementById('paypal-button-container').innerHTML = ''; 
     paypal.Buttons({
-        createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: amount.toString() } }] }),
+        createOrder: (data, actions) => {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: { value: amount.toString() }
+                }]
+            });
+        },
         onApprove: async (data, actions) => {
             await actions.order.capture();
-            await db.collection('profiles').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(coins) });
+            
+            // සල්ලි ගෙවුවට පස්සේ තෝරාගත් පැකේජ් එකේ කොයින්ස් ගාණ එකතු කිරීම
+            await db.collection('profiles').doc(currentUser.uid).update({
+                coins: firebase.firestore.FieldValue.increment(coins)
+            });
+            
             toast(`Success! ${coins} Diamonds Added.`);
+        },
+        onError: (err) => {
+            toast("Payment Error!");
+            console.error(err);
         }
     }).render('#paypal-button-container');
 }
