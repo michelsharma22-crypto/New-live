@@ -155,6 +155,32 @@
 </div>
 
 <div id="live-screen" class="hidden fixed inset-0 z-[2000] bg-black">
+    <div class="absolute top-10 left-4 right-4 flex justify-between items-start z-[4000] pointer-events-none">
+    
+    <div class="flex items-center gap-2 bg-black/30 backdrop-blur-md p-1 pr-3 rounded-full border border-white/10 pointer-events-auto">
+        <img id="live-host-img" src="https://via.placeholder.com/40" class="w-9 h-9 rounded-full border-2 border-red-600 object-cover">
+        <div class="flex flex-col">
+            <span id="live-host-name" class="text-white text-[11px] font-bold leading-tight">Loading...</span>
+            <span class="text-red-500 text-[9px] font-black uppercase tracking-tighter">🔴 LIVE</span>
+        </div>
+        <button onclick="followHost()" class="ml-2 bg-red-600 text-white text-[10px] font-extrabold px-3 py-1 rounded-full active:scale-95 transition">FOLLOW</button>
+    </div>
+
+    <div class="flex items-center gap-2 pointer-events-auto">
+        <div class="bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
+            <span class="text-white text-[11px] font-bold">👤 <span id="live-viewers">0</span></span>
+        </div>
+        
+        <div class="bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
+            <span class="text-yellow-400 text-[11px] font-bold">💎 <span id="live-gifts-total" class="text-white">0</span></span>
+        </div>
+
+        <button onclick="shareLive()" class="w-9 h-9 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/10 active:scale-95">
+            <i class="fas fa-share-alt text-sm"></i>
+        </button>
+    </div>
+</div>
+
     <div id="remote-player"></div>
     <div id="local-player"></div>
     <div class="absolute top-10 right-4 z-[3100] pointer-events-auto">
@@ -510,7 +536,47 @@ async function exitLive() {
         }
     }
 }
+// 1. Host ගේ නම සහ රූපය ලයිව් එකට යනකොට අප්ඩේට් කිරීම
+function updateHostUI(name, photo) {
+    document.getElementById('live-host-name').innerText = name;
+    document.getElementById('live-host-img').src = photo || "https://via.placeholder.com/40";
+}
 
+// 2. Follow කිරීමේ පහසුකම (Database එකට Connect වේ)
+async function followHost() {
+    if(!currentUser) return toast("Please login to follow!");
+    
+    // මෙතනදී අපි 'follows' කියන collection එකට data දානවා
+    try {
+        await db.collection('follows').add({
+            followerId: currentUser.uid,
+            followingId: "HOST_ID_HERE", // මේක dynamic විදියට ගන්න ඕනේ
+            timestamp: Date.now()
+        });
+        toast("Following Host!");
+    } catch(e) {
+        toast("Already following or Error!");
+    }
+}
+
+// 3. ලයිව් එක Share කිරීම (Web Share API)
+async function shareLive() {
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Galaxy Live',
+                text: 'මෙන්න මම Galaxy App එකේ Live ඉන්නවා. ඇවිත් සෙට් වෙන්න!',
+                url: window.location.href
+            });
+        } catch (err) {
+            console.log("Share cancelled");
+        }
+    } else {
+        // Share කරන්න බැරි Browser එකක් නම් URL එක කොපි කරනවා
+        navigator.clipboard.writeText(window.location.href);
+        toast("Link copied to clipboard!");
+    }
+}
 
 </script>
 </body>
