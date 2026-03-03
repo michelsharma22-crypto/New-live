@@ -38,10 +38,8 @@
         <input id="auth-pass" type="password" placeholder="Password" class="w-full bg-gray-100 p-4 rounded-2xl border border-gray-200 outline-none text-black">
         
         <button onclick="handleAuth('register')" class="w-full bg-red-600 py-4 rounded-2xl text-white font-bold shadow-lg shadow-red-200 active:scale-95 transition">GET STARTED</button>
-        <button onclick="handleAuth('login')" class="w-full text-zinc-500 py-2 font-medium text-sm">Already have an account? <span class="text-red-600 font-bold">Login</span></button>
-    </div>
-</div>
-
+        <button onclick="document.getElementById('reg-name').parentElement.style.display='none'; this.parentElement.querySelector('button').innerText='LOGIN'; this.style.display='none'" class="w-full text-zinc-500 py-2 font-medium text-sm">Already have an account? <span class="text-red-600 font-bold">Login</span></button>
+        
 <div id="home-screen" class="screen p-4">
     <div class="flex justify-between items-center py-4 mb-4">
         <h2 class="text-xl font-bold italic">GALAXY <span class="text-pink-500">LIVE</span></h2>
@@ -340,17 +338,22 @@ async function handleAuth(type) {
     const pass = document.getElementById('auth-pass').value;
     const name = document.getElementById('reg-name').value;
 
+    if (!email || !pass) return toast("Please fill all fields!");
+
     try {
         if (type === 'register') {
+            if (!name) return toast("Enter your name!");
             const res = await auth.createUserWithEmailAndPassword(email, pass);
             await db.collection('profiles').doc(res.user.uid).set({
-                uid: res.user.uid, displayName: name, coins: 50, // Feature 2
+                uid: res.user.uid, displayName: name, coins: 50,
                 bio: "New Galaxy User", photoURL: "https://via.placeholder.com/150",
                 country: "SL", age: 18, islive: false, lastBonus: 0
             });
-            toast("Registered! 💎50 Bonus Received.");
+            toast("Registered! 💎 50 Bonus Received.");
         } else {
+            // මේ කොටස තමයි ලොගින් වෙන්න උදව් වෙන්නේ
             await auth.signInWithEmailAndPassword(email, pass);
+            toast("Welcome Back!");
         }
     } catch (e) { toast(e.message); }
 }
