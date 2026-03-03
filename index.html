@@ -366,6 +366,24 @@ async function handleAuth(type) {
         }
     } catch (e) { toast(e.message); }
 }
+let isLoginMode = false;
+
+function toggleAuth() {
+    isLoginMode = !isLoginMode;
+    const nameField = document.getElementById('reg-name').parentElement;
+    const mainBtn = document.querySelector('button[onclick*="handleAuth"]');
+    const toggleBtn = document.querySelector('button[onclick*="toggleAuth"] span') || document.querySelector('.text-red-600');
+
+    if (isLoginMode) {
+        nameField.style.display = 'none'; 
+        mainBtn.innerText = 'LOGIN';
+        mainBtn.setAttribute('onclick', "handleAuth('login')");
+    } else {
+        nameField.style.display = 'block';
+        mainBtn.innerText = 'GET STARTED';
+        mainBtn.setAttribute('onclick', "handleAuth('register')");
+    }
+}
 
 // --- NAVIGATION & SEARCH (Feature 11, 17) ---
 function switchTab(id) {
