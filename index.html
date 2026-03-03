@@ -29,17 +29,26 @@
 
 <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-[3000]"></div>
 <div id="auth-screen" class="fixed inset-0 z-[2500] bg-white flex flex-col items-center justify-center p-8">
-    <h1 class="text-6xl font-black italic text-red-600 mb-2">GALAXY</h1>
+    <h1 class="text-6xl font-black italic text-red-600 mb-2 text-center">GALAXY</h1>
     <p class="text-zinc-500 mb-10 tracking-widest text-xs uppercase font-bold">Live Streaming System</p>
     
     <div class="w-full max-w-sm space-y-4">
-        <input id="reg-name" type="text" placeholder="Full Name" class="w-full bg-gray-100 p-4 rounded-2xl border border-gray-200 outline-none text-black">
+        <div id="reg-name-container">
+            <input id="reg-name" type="text" placeholder="Full Name" class="w-full bg-gray-100 p-4 rounded-2xl border border-gray-200 outline-none text-black">
+        </div>
+        
         <input id="auth-email" type="email" placeholder="Email Address" class="w-full bg-gray-100 p-4 rounded-2xl border border-gray-200 outline-none text-black">
         <input id="auth-pass" type="password" placeholder="Password" class="w-full bg-gray-100 p-4 rounded-2xl border border-gray-200 outline-none text-black">
         
-        <button onclick="handleAuth('register')" class="w-full bg-red-600 py-4 rounded-2xl text-white font-bold shadow-lg shadow-red-200 active:scale-95 transition">GET STARTED</button>
-        <button onclick="document.getElementById('reg-name').parentElement.style.display='none'; this.parentElement.querySelector('button').innerText='LOGIN'; this.style.display='none'" class="w-full text-zinc-500 py-2 font-medium text-sm">Already have an account? <span class="text-red-600 font-bold">Login</span></button>
+        <button id="auth-main-btn" onclick="performAuth()" class="w-full bg-red-600 py-4 rounded-2xl text-white font-bold shadow-lg shadow-red-200 active:scale-95 transition">GET STARTED</button>
         
+        <p class="text-center text-zinc-500 text-sm">
+            <span id="auth-msg">Already have an account?</span> 
+            <span id="auth-toggle-btn" onclick="toggleAuth()" class="text-red-600 font-bold cursor-pointer">Login</span>
+        </p>
+    </div>
+</div>
+
 <div id="home-screen" class="screen p-4">
     <div class="flex justify-between items-center py-4 mb-4">
         <h2 class="text-xl font-bold italic">GALAXY <span class="text-pink-500">LIVE</span></h2>
