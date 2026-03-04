@@ -335,6 +335,30 @@ async function uploadPhoto(file) {
     document.getElementById('edit-preview').src = data.secure_url;
     toast("Profile Photo Updated! âœ¨");
 }
+async function joinLive(uid, hostName, hostPhoto) {
+    try {
+        currentChannel = uid;
+        document.getElementById('live-screen').classList.remove('hidden');
+        
+        // Host ගේ විස්තර UI එකට දානවා
+        document.getElementById('host-name').innerText = hostName;
+        document.getElementById('host-img').src = hostPhoto || "https://via.placeholder.com/40";
+
+        client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
+        await client.setClientRole("audience");
+        await client.join("1dad2898a8364e9c94875beb9823d2b7", uid, null, null);
+
+        client.on("user-published", async (user, mediaType) => {
+            await client.subscribe(user, mediaType);
+            if (mediaType === "video") {
+                const remoteContainer = document.getElementById('remote-player');
+                user.videoTrack.play(remoteContainer);
+            }
+            if (mediaType === "audio") { user.audioTrack.play(); }
+        });
+        toast("Joining Live...");
+    } catch (e) { console.error("Join Error:", e); }
+}
 
 // --- LIVE STREAMING (Feature 6, 14, 18) ---
 async function startLive() {
