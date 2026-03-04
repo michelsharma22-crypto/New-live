@@ -138,21 +138,35 @@
         </div>
 
         <div class="w-full space-y-4">
-            <input id="up-name" type="text" placeholder="Full Name" class="w-full bg-zinc-900 p-4 rounded-2xl outline-none">
-            <textarea id="up-bio" placeholder="About you..." class="w-full bg-zinc-900 p-4 rounded-2xl outline-none h-24"></textarea>
-            <div class="grid grid-cols-2 gap-4">
-                <input id="up-age" type="number" placeholder="Age" class="bg-zinc-900 p-4 rounded-2xl outline-none">
-                <select id="up-gender" class="bg-zinc-900 p-4 rounded-2xl outline-none">
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </select>
-            </div>
-            <input id="up-country" type="text" placeholder="Country" class="w-full bg-zinc-900 p-4 rounded-2xl outline-none">
-            <button onclick="saveProfile()" class="w-full bg-pink-600 py-4 rounded-2xl font-bold mt-6">Update Profile</button>
-            <button onclick="auth.signOut()" class="w-full text-zinc-600 text-sm">Sign Out</button>
-        </div>
+    <input id="up-username" type="text" placeholder="@username" class="w-full bg-zinc-900 p-4 rounded-2xl">
+    
+    <input id="up-name" type="text" placeholder="Full Name" class="w-full bg-zinc-900 p-4 rounded-2xl">
+    
+    <div class="grid grid-cols-2 gap-4">
+        <input id="up-email" type="email" placeholder="Email Address" class="bg-zinc-900 p-4 rounded-2xl" disabled>
+        <input id="up-pass" type="password" placeholder="New Password" class="bg-zinc-900 p-4 rounded-2xl">
     </div>
+
+    <textarea id="up-bio" placeholder="About you..." class="w-full bg-zinc-900 p-4 rounded-2xl h-24"></textarea>
+    
+    <div class="grid grid-cols-2 gap-4">
+        <input id="up-birthday" type="date" class="bg-zinc-900 p-4 rounded-2xl text-zinc-400">
+        <input id="up-age" type="number" placeholder="Age" class="bg-zinc-900 p-4 rounded-2xl">
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+        <select id="up-gender" class="bg-zinc-900 p-4 rounded-2xl outline-none">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+        <input id="up-country" type="text" placeholder="Country" class="bg-zinc-900 p-4 rounded-2xl">
+    </div>
+
+    <input id="up-lang" type="text" placeholder="Language" class="w-full bg-zinc-900 p-4 rounded-2xl">
+    
+    <button onclick="saveProfile()" class="w-full bg-pink-600 py-4 rounded-2xl font-bold">Update Profile</button>
 </div>
+
 
 <div id="live-screen" class="hidden fixed inset-0 z-[2000] bg-black">
   <div class="absolute top-10 left-4 flex flex-col gap-3 z-[4000] pointer-events-none">
@@ -458,6 +472,29 @@ function initPayPal(amount, coins) {
     }).render('#paypal-button-container');
 }
 
+async function saveProfile() {
+    if (!currentUser) return toast("Please login first!");
+
+    const data = {
+        username: document.getElementById('up-username').value,
+        displayName: document.getElementById('up-name').value,
+        bio: document.getElementById('up-bio').value,
+        birthday: document.getElementById('up-birthday').value,
+        age: document.getElementById('up-age').value,
+        gender: document.getElementById('up-gender').value,
+        country: document.getElementById('up-country').value,
+        language: document.getElementById('up-lang').value,
+        password: document.getElementById('up-pass').value // සටහන: මෙය සැබෑ පද්ධතියකදී hash කළ යුතුය
+    };
+
+    try {
+        await db.collection('profiles').doc(currentUser.uid).update(data);
+        toast("Profile Updated Successfully! ✅");
+        setTimeout(() => { location.reload(); }, 1000);
+    } catch (e) {
+        toast("Update Error!");
+    }
+}
 
 
 // --- UTILS ---
