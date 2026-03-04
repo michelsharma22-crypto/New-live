@@ -316,8 +316,13 @@ function searchUsers() { loadUsers(document.getElementById('user-search').value)
 
 function userClick(uid) {
     db.collection('profiles').doc(uid).get().then(doc => {
-        if (doc.data().islive) joinLive(uid);
-        else toast(`${doc.data().displayName}: ${doc.data().bio}`); // Feature 3
+        const data = doc.data();
+        if (data.islive) {
+            // මෙතන arguments 3ම තියෙන්න ඕනේ
+            joinLive(uid, data.displayName, data.photoURL);
+        } else {
+            toast(`${data.displayName}: ${data.bio || 'No bio'}`);
+        }
     });
 }
 
