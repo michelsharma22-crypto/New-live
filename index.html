@@ -375,10 +375,12 @@ async function startLive() {
         document.getElementById('local-player').classList.remove('hidden');
         updateHostUI(currentUser.displayName, currentUser.photoURL);
         
-        await client.join("1dad2898a8364e9c94875beb9823d2b7", currentHost, null, currentHost);
-        localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-        localTracks[1].play('local-player');
-        await client.publish(localTracks);
+        // මේකෙන් තමයි කැමරාව හරියටම පණගැන්වෙන්නේ
+await client.join("1dad2898a8364e9c94875beb9823d2b7", currentUser.uid, null, null);
+localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
+localTracks[1].play('local-player');
+await client.publish(localTracks);
+
         
         await db.collection('profiles').doc(currentUser.uid).update({ islive: true });
         toast("You are now LIVE! ðŸ”´");
