@@ -373,7 +373,7 @@ async function startLive() {
         updateLiveHostUI();
         document.getElementById('live-screen').classList.remove('hidden');
         document.getElementById('local-player').classList.remove('hidden');
-        updateHostUI(currentUser.displayName, currentUser.photoURL);
+        updateLiveHostUI(currentUser.displayName, currentUser.photoURL);
         
         // මේකෙන් තමයි කැමරාව හරියටම පණගැන්වෙන්නේ
 await client.join("1dad2898a8364e9c94875beb9823d2b7", currentUser.uid, null, null);
