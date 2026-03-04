@@ -351,7 +351,7 @@ async function joinLive(uid, hostName, hostPhoto) {
 
         client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
         await client.setClientRole("audience");
-        await client.join("1dad2898a8364e9c94875beb9823d2b7", uid, null, null);
+        await client.join("1dad2898a8364e9c94875beb9823d2b7", uid, null, null, null, null);
 
         client.on("user-published", async (user, mediaType) => {
             await client.subscribe(user, mediaType);
