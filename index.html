@@ -504,6 +504,16 @@ function initUser() {
         document.getElementById('nav-coins').innerText = d.coins;
         document.getElementById('wallet-coins').innerText = d.coins;
         document.getElementById('up-name').value = d.displayName;
+        // 470 පේළියට පල්ලෙහායින් (471 පේළියට) මේ ටික පේස්ට් කරන්න
+document.getElementById('up-username').value = d.username || "";
+document.getElementById('up-email').value = currentUser.email; 
+document.getElementById('up-bio').value = d.bio || "";
+document.getElementById('up-birthday').value = d.birthday || "";
+document.getElementById('up-age').value = d.age || "";
+document.getElementById('up-gender').value = d.gender || "Male";
+document.getElementById('up-country').value = d.country || "";
+document.getElementById('up-lang').value = d.language || "";
+
         document.getElementById('edit-preview').src = d.photoURL;
     });
     loadUsers();
