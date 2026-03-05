@@ -252,13 +252,6 @@
     </div>
 </div>
 
-<nav style="position: fixed !important; bottom: 0 !important; left: 0; right: 0; height: 70px; background: white; display: flex; justify-content: space-around; align-items: center; z-index: 99999; border-top: 1px solid #ddd;">
-    <button onclick="switchTab('home')" style="color: #555;"><i class="fas fa-home text-xl"></i><br><span style="font-size: 10px;">Home</span></button>
-    <button onclick="startLive()" style="width: 50px; height: 50px; background: pink; border-radius: 50%; border: none;"><i class="fas fa-video"></i></button>
-    <button onclick="switchTab('wallet')" style="color: #555;"><i class="fas fa-wallet text-xl"></i><br><span style="font-size: 10px;">Wallet</span></button>
-    <button onclick="switchTab('profile')" style="color: #555;"><i class="fas fa-user text-xl"></i><br><span style="font-size: 10px;">Profile</span></button>
-</nav>
-
 <script>
 // --- CONFIGURATIONS --- 
 const firebaseConfig = { apiKey: "AIzaSyBwDUe5E8qRY1dbZzUQJu9eCAKBS7YSHVU", authDomain: "live-e6771.firebaseapp.com", projectId: "live-e6771", storageBucket: "live-e6771.firebasestorage.app", messagingSenderId: "570901004231", appId: "1:570901004231:web:220679cf41cf55b98023e2" };
@@ -661,5 +654,11 @@ async function followHost() {
 }
 
 </script>
+        <nav style="position: fixed !important; bottom: 0 !important; left: 0; right: 0; height: 70px; background: white; display: flex; justify-content: space-around; align-items: center; z-index: 99999; border-top: 1px solid #ddd;">
+    <button onclick="switchTab('home')" style="color: #555;"><i class="fas fa-home text-xl"></i><br><span style="font-size: 10px;">Home</span></button>
+    <button onclick="startLive()" style="width: 50px; height: 50px; background: pink; border-radius: 50%; border: none;"><i class="fas fa-video"></i></button>
+    <button onclick="switchTab('wallet')" style="color: #555;"><i class="fas fa-wallet text-xl"></i><br><span style="font-size: 10px;">Wallet</span></button>
+    <button onclick="switchTab('profile')" style="color: #555;"><i class="fas fa-user text-xl"></i><br><span style="font-size: 10px;">Profile</span></button>
+</nav>
 </body>
 </html>
