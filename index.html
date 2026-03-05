@@ -652,13 +652,12 @@ async function followHost() {
     toast("Following Host!"); 
     // මෙතනට පස්සේ DB logic එක දාන්න පුළුවන්
 }
-
-</script>
-        <nav style="position: fixed !important; bottom: 0 !important; left: 0; right: 0; height: 70px; background: white; display: flex; justify-content: space-around; align-items: center; z-index: 99999; border-top: 1px solid #ddd;">
-    <button onclick="switchTab('home')" style="color: #555;"><i class="fas fa-home text-xl"></i><br><span style="font-size: 10px;">Home</span></button>
-    <button onclick="startLive()" style="width: 50px; height: 50px; background: pink; border-radius: 50%; border: none;"><i class="fas fa-video"></i></button>
-    <button onclick="switchTab('wallet')" style="color: #555;"><i class="fas fa-wallet text-xl"></i><br><span style="font-size: 10px;">Wallet</span></button>
-    <button onclick="switchTab('profile')" style="color: #555;"><i class="fas fa-user text-xl"></i><br><span style="font-size: 10px;">Profile</span></button>
+<nav style="position: fixed !important; bottom: 0 !important; left: 0; right: 0; height: 70px; background: white !important; display: flex !important; justify-content: space-around; align-items: center; z-index: 99999; border-top: 1px solid #ddd; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);">
+    <button onclick="switchTab('home')" style="border:none; background:none; color:#555; text-align:center;"><i class="fas fa-home" style="font-size:20px;"></i><br><span style="font-size:10px;">Home</span></button>
+    <button onclick="startLive()" style="border:none; width:50px; height:50px; background:pink; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white;"><i class="fas fa-video"></i></button>
+    <button onclick="switchTab('wallet')" style="border:none; background:none; color:#555; text-align:center;"><i class="fas fa-wallet" style="font-size:20px;"></i><br><span style="font-size:10px;">Wallet</span></button>
+    <button onclick="switchTab('profile')" style="border:none; background:none; color:#555; text-align:center;"><i class="fas fa-user" style="font-size:20px;"></i><br><span style="font-size:10px;">Profile</span></button>
 </nav>
+
 </body>
 </html>
