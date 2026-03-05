@@ -272,6 +272,7 @@ auth.onAuthStateChanged(user => {
         currentUser = user;
         document.getElementById('auth-screen').style.display = 'none';
         initUser();
+        switchTab('home');
     } else {
         document.getElementById('auth-screen').style.display = 'flex';
     }
@@ -309,7 +310,7 @@ function loadUsers(term = "") {
         grid.innerHTML = '';
         snap.forEach(doc => {
             const u = doc.data();
-            if (u.uid === currentUser.uid) return;
+            if (currentUser && u.uid === currentUser.uid) return;
             if (term && !u.displayName.toLowerCase().includes(term.toLowerCase())) return;
 
             grid.innerHTML += `
@@ -499,24 +500,20 @@ async function saveProfile() {
 
 // --- UTILS ---
 function initUser() {
+    if (!currentUser) return;
     db.collection('profiles').doc(currentUser.uid).onSnapshot(doc => {
         const d = doc.data();
-        document.getElementById('nav-coins').innerText = d.coins;
-        document.getElementById('wallet-coins').innerText = d.coins;
-        document.getElementById('up-name').value = d.displayName;
-        // 470 පේළියට පල්ලෙහායින් (471 පේළියට) මේ ටික පේස්ට් කරන්න
-document.getElementById('up-username').value = d.username || "";
-document.getElementById('up-email').value = currentUser.email; 
-document.getElementById('up-bio').value = d.bio || "";
-document.getElementById('up-birthday').value = d.birthday || "";
-document.getElementById('up-age').value = d.age || "";
-document.getElementById('up-gender').value = d.gender || "Male";
-document.getElementById('up-country').value = d.country || "";
-document.getElementById('up-lang').value = d.language || "";
-
-        document.getElementById('edit-preview').src = d.photoURL;
+        if (!d) return;
+        document.getElementById('nav-coins').innerText = d.coins || 0;
+        document.getElementById('wallet-coins').innerText = d.coins || 0;
+        document.getElementById('up-name').value = d.displayName || "";
+        document.getElementById('up-username').value = d.username || "";
+        document.getElementById('up-bio').value = d.bio || "";
+        document.getElementById('up-age').value = d.age || "";
+        document.getElementById('up-country').value = d.country || "";
+        document.getElementById('edit-preview').src = d.photoURL || "https://via.placeholder.com/150";
     });
-    loadUsers();
+    loadUsers(); // යූසර්ස්ලව ලෝඩ් කරන්න මෙතනින් කෝල් කරන්න ඕනේ
 }
 
 function claimDaily() {
